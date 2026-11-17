@@ -382,7 +382,22 @@ form.addEventListener("submit", async (e) => {
     }
   } catch (err) {
     console.error("[RUMOAR] sign-up failed", err);
-    $("#signupError").textContent = "Something went wrong on our side. Please try again in a moment.";
+    // Visitors see a polite line; the small code underneath tells you what to fix in Firebase.
+    const code = String(err?.code || err?.message || "unknown").replace(/^(auth|firestore)\//, "").replace(/\.+$/, "");
+    const HINTS = {
+      "admin-restricted-operation": "Anonymous sign-in is turned off (Firebase → Authentication → Sign-in method).",
+      "operation-not-allowed": "Anonymous sign-in is turned off (Firebase → Authentication → Sign-in method).",
+      "configuration-not-found": "Authentication isn't set up yet (Firebase → Authentication → Get started).",
+      "unauthorized-domain": "This website's address isn't in Authentication → Settings → Authorized domains.",
+      "api-key-not-valid.-please-pass-a-valid-api-key":"apiKey in firebase-config.js is wrong.",
+      "invalid-api-key": "apiKey in firebase-config.js is wrong.",
+      "permission-denied": "Firestore rules are blocking this. Re-paste firestore.rules and Publish.",
+      "not-found": "Firestore database isn't created yet (Firebase → Firestore Database).",
+      "failed-precondition": "Firestore database isn't created yet (Firebase → Firestore Database).",
+      "network-request-failed": "Network problem. Check the connection and try again.",
+    };
+    const hint = HINTS[code] || "";
+    $("#signupError").innerHTML = `Something went wrong on our side. Please try again in a moment.<br/><small style="color:#8c8a85">Error code: ${esc(code)}${hint ? ". " + esc(hint) : ""}</small>`;
   } finally {
     btn.disabled = false; btn.firstChild.textContent = "Enter RUMOAR ";
   }
