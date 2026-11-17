@@ -10,14 +10,14 @@
 // ─────────────────────────────────────────────────────────────
 
 export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:0000000000000000",
+  apiKey: "AIza....",
+  authDomain: "rumoar-xxxx.firebaseapp.com",
+  projectId: "rumoar-xxxx",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
 };
 
 // The Google account allowed to open /admin.html and see sign-ups.
 // Must match the email in firestore.rules.
-export const ADMIN_EMAIL = "you@example.com";
+export const ADMIN_EMAIL = "shreyashm3624@gmail.com";
