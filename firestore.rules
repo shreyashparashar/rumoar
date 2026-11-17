@@ -1,0 +1,49 @@
+rules_version = '2';
+
+// RUMOAR · Firestore security rules
+// Paste this whole file into Firebase Console → Firestore Database → Rules → Publish.
+// Replace you@example.com with the Google account that should see sign-ups (same as ADMIN_EMAIL in firebase-config.js).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'you@example.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function validMember(d) {
+      return d.keys().hasOnly(['name','email','phone','age','favCharacter','wishlist','source','createdAt','updatedAt'])
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 80
+        && d.email is string && d.email.size() <= 120 && d.email.matches('[^@ ]+@[^@ ]+[.][^@ ]+')
+        && d.phone is string && d.phone.size() >= 8 && d.phone.size() <= 16
+        && d.age is int && d.age >= 13 && d.age <= 100
+        && d.favCharacter is string && d.favCharacter.size() >= 1 && d.favCharacter.size() <= 80
+        && d.wishlist is list && d.wishlist.size() <= 50
+        && d.source is string && d.source.size() <= 100;
+    }
+
+    // One document per visitor, keyed by their anonymous Firebase user id.
+    match /members/{uid} {
+      // Visitors can create their own record once…
+      allow create: if request.auth != null && request.auth.uid == uid
+        && validMember(request.resource.data);
+
+      // …and afterwards only change their wishlist.
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wishlist','updatedAt'])
+        && request.resource.data.wishlist is list
+        && request.resource.data.wishlist.size() <= 50;
+
+      // Only the visitor themselves and the admin can read.
+      allow read: if (request.auth != null && request.auth.uid == uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
