@@ -1,21 +1,18 @@
 // ─────────────────────────────────────────────────────────────
-//  Paste your Firebase web-app config here (see README, step 2).
-//  These values are safe to commit publicly — Firebase web keys
+//  Firebase web-app config for RUMOAR (project rumoar-58160).
+//  These values are safe to commit publicly. Firebase web keys
 //  identify your project, they don't grant access. Access is
 //  controlled by firestore.rules.
-//
-//  While apiKey still says "YOUR_API_KEY" the site runs in DEMO
-//  MODE: everything works, but sign-ups stay in the visitor's own
-//  browser instead of reaching your database.
 // ─────────────────────────────────────────────────────────────
 
 export const firebaseConfig = {
-  apiKey: "AIza....",
-  authDomain: "rumoar-xxxx.firebaseapp.com",
-  projectId: "rumoar-xxxx",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "..."
+  apiKey: "AIzaSyCcXvz91rrQrKj5cTeq5g4nXBNkFx32pho",
+  authDomain: "rumoar-58160.firebaseapp.com",
+  projectId: "rumoar-58160",
+  storageBucket: "rumoar-58160.firebasestorage.app",
+  messagingSenderId: "1098563310",
+  appId: "1:1098563310:web:62460ca1a2f131f2aabdff",
+  measurementId: "G-01GVH27QDM",
 };
 
 // The Google account allowed to open /admin.html and see sign-ups.
