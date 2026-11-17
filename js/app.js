@@ -1,5 +1,6 @@
 import { PRODUCTS, CATEGORIES, byId, formatINR } from "./products.js";
 import { createStore } from "./store.js";
+import { initRings, PERSONAS } from "./rings.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -16,16 +17,80 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label ?? "";
 
+/* ───────── split-flap board (airport style) ───────── */
+const FLAP_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+class Flap {
+  constructor(el, length) {
+    this.el = el; this.len = length; this.cur = " ".repeat(length); this.timers = [];
+    el.textContent = "";
+    this.cells = Array.from({ length }, () => {
+      const c = document.createElement("span");
+      c.className = "flap__c"; c.setAttribute("aria-hidden", "true"); c.textContent = " ";
+      el.appendChild(c); return c;
+    });
+  }
+  show(i, ch) {
+    const c = this.cells[i];
+    c.textContent = ch === " " ? " " : ch;
+    c.classList.toggle("is-blank", ch === " ");
+    if (reduceMotion) return;
+    c.classList.remove("flip"); void c.offsetWidth; c.classList.add("flip");
+  }
+  set(text) {
+    const t = String(text).toUpperCase().slice(0, this.len).padEnd(this.len, " ");
+    this.el.setAttribute("aria-label", t.trim());
+    this.timers.forEach(clearTimeout); this.timers = [];
+    [...t].forEach((target, i) => {
+      if (target === this.cur[i] && this.cells[i].textContent === (target === " " ? " " : target)) return;
+      if (reduceMotion) return this.show(i, target);
+      const steps = 3 + Math.floor(Math.random() * 6);
+      let n = 0;
+      const tick = () => {
+        this.show(i, n < steps ? FLAP_CHARS[Math.floor(Math.random() * FLAP_CHARS.length)] : target);
+        if (n++ < steps) this.timers.push(setTimeout(tick, 52));
+      };
+      this.timers.push(setTimeout(tick, i * 32));
+    });
+    this.cur = t;
+  }
+}
+
 /* ───────── nav ───────── */
 const nav = $("#nav");
-const onScroll = () => nav.classList.toggle("is-solid", scrollY > innerHeight * 0.75);
+const darkZones = [...document.querySelectorAll("[data-dark]")];
+const onScroll = () => {
+  nav.classList.toggle("is-solid", scrollY > innerHeight * 0.75);
+  const y = nav.offsetHeight / 2;
+  nav.classList.toggle("is-dark", darkZones.some((el) => { const r = el.getBoundingClientRect(); return r.top <= y && r.bottom >= y; }));
+};
 addEventListener("scroll", onScroll, { passive: true });
 onScroll();
 
-function renderMember() {
+// "HI, RUDRA" ↔ "HI, BATMAN", flipping like a departures board, forever.
+let navTimer = null;
+function renderNavName() {
   const m = store.member;
   const btn = $("#navMember");
-  btn.textContent = m ? `Hi, ${m.name.split(" ")[0]}` : "Join the list";
+  clearInterval(navTimer);
+  if (!m) { btn.textContent = "Join the list"; btn.removeAttribute("aria-label"); return; }
+  const first = m.name.split(" ")[0].slice(0, 14);
+  const hero = (m.favCharacter || "").slice(0, 14);
+  const words = [first, hero || first];
+  const len = Math.max(...words.map((w) => w.length));
+  btn.textContent = "Hi, ";
+  btn.setAttribute("aria-label", `Signed in as ${m.name}. Open wishlist`);
+  const holder = document.createElement("span");
+  holder.className = "flap flap--bare";
+  btn.appendChild(holder);
+  const flap = new Flap(holder, len);
+  let k = 0;
+  flap.set(words[0]);
+  if (words[0] !== words[1]) navTimer = setInterval(() => { k = 1 - k; flap.set(words[k]); }, 3400);
+}
+
+function renderMember() {
+  const m = store.member;
+  renderNavName();
   $("#heroCta").innerHTML = m ? 'Enter the collection <span aria-hidden="true">→</span>' : 'Enter the world <span aria-hidden="true">→</span>';
   $("#closerCta").innerHTML = m ? 'View your wishlist <span aria-hidden="true">→</span>' : 'Join the list <span aria-hidden="true">→</span>';
   $("#collection").classList.toggle("is-locked", !m);
@@ -45,36 +110,121 @@ $("#heroCta").addEventListener("click", () => (store.member ? $("#collection").s
 $("#closerCta").addEventListener("click", () => (store.member ? openDrawer() : openSignup()));
 document.addEventListener("click", (e) => { if (e.target.closest("[data-open-signup]")) openSignup(); });
 
-/* ───────── "Who are you today?" rotator ───────── */
+/* ───────── live clock (IST) ───────── */
 (() => {
-  const order = ["maverick", "provocateur", "chameleon", "outlier", "heir", "diplomat", "purist", "vanguard"];
-  const card = $("#whoCard"), A = $("#whoImgA"), B = $("#whoImgB");
-  let i = 0, front = A, back = B, timer;
-  const set = (p, img) => { img.src = p.images[0]; img.alt = `${p.name} — ${p.type}`; };
-  const first = byId[order[0]];
-  set(first, A); B.classList.add("is-out");
-  $("#whoName").textContent = first.name; $("#whoLine").textContent = first.tagline;
+  const el = $("#clock");
+  const fmt = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  const tick = () => { el.textContent = `IST ${fmt.format(new Date())}`; };
+  tick(); setInterval(tick, 1000);
+})();
 
-  function next() {
-    i = (i + 1) % order.length;
-    const p = byId[order[i]];
-    set(p, back);
-    card.classList.add("is-swapping");
-    const go = () => {
-      back.classList.remove("is-out"); front.classList.add("is-out");
-      [front, back] = [back, front];
-      setTimeout(() => {
-        $("#whoName").textContent = p.name; $("#whoLine").textContent = p.tagline;
-        card.classList.remove("is-swapping");
-      }, 300);
+/* ───────── hero: bag on stage + flap board, cycling ───────── */
+(() => {
+  const ORDER = ["vanguard", "drifter", "chameleon", "maverick", "provocateur", "diplomat", "operator"];
+  const flap = new Flap($("#heroFlap"), 15);
+  const imgs = $$(".hero__bag");
+  const tag = $("#heroTag"), spec = $(".hero__spec");
+  let i = 0, front = 0, timer;
+  ORDER.forEach((id) => { const im = new Image(); im.src = `assets/hero/${id}.webp`; }); // warm the cache
+
+  function paint(id, instant) {
+    const p = byId[id];
+    flap.set(p.name);
+    const n = PRODUCTS.indexOf(p) + 1;
+    const write = () => {
+      tag.textContent = p.tagline;
+      $("#heroIdx").textContent = `${String(n).padStart(2, "0")} / ${PRODUCTS.length}`;
+      $("#heroType").textContent = p.type;
+      $("#heroPrice").textContent = formatINR(p.price);
+      tag.classList.remove("is-out"); spec.classList.remove("is-out");
     };
-    back.decode ? back.decode().then(go, go) : go();
+    if (instant) return write();
+    tag.classList.add("is-out"); spec.classList.add("is-out");
+    setTimeout(write, 420);
   }
-  const start = () => { if (!reduceMotion) timer = setInterval(next, 3200); };
-  const stop = () => clearInterval(timer);
-  // only rotate while visible
-  new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0.2 }).observe(card);
-  card.addEventListener("click", () => openProduct(order[i]));
+  function next() {
+    i = (i + 1) % ORDER.length;
+    const id = ORDER[i], back = imgs[1 - front];
+    back.src = `assets/hero/${id}.webp`;
+    const swap = () => { back.classList.add("is-on"); imgs[front].classList.remove("is-on"); front = 1 - front; };
+    (back.decode ? back.decode() : Promise.resolve()).then(swap, swap);
+    paint(id);
+  }
+  paint(ORDER[0], true);
+  const start = () => { if (!reduceMotion && !timer) timer = setInterval(next, 4200); };
+  const stop = () => { clearInterval(timer); timer = null; };
+  new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop())).observe($(".hero"));
+  $("#heroStage").addEventListener("click", () => openProduct(ORDER[i]));
+})();
+
+/* ───────── who are you today: personality rings ───────── */
+(() => {
+  const flap = new Flap($("#ringFlap"), Math.max(...PERSONAS.map((p) => p.length)));
+  flap.set("RUMOAR");
+  initRings($("#rumoar-rings"), { onLook: (name) => flap.set(name) });
+})();
+
+/* ───────── ethos: manifesto lights up word by word as you scroll ───────── */
+(() => {
+  const el = $("#manifesto");
+  const wrap = (node) => {
+    [...node.childNodes].forEach((n) => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) frag.appendChild(document.createTextNode(part));
+          else { const s = document.createElement("span"); s.className = "w"; s.textContent = part; frag.appendChild(s); }
+        });
+        n.replaceWith(frag);
+      } else wrap(n);
+    });
+  };
+  wrap(el);
+  const words = $$(".w", el);
+  if (reduceMotion) { words.forEach((w) => w.classList.add("on")); return; }
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const r = el.getBoundingClientRect(), vh = innerHeight;
+    const p = Math.min(1, Math.max(0, (vh * 0.82 - r.top) / (r.height + vh * 0.3)));
+    const lit = Math.round(p * words.length);
+    words.forEach((w, k) => w.classList.toggle("on", k < lit));
+  };
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  update();
+})();
+
+/* ───────── ethos: rule images keep turning front/side ───────── */
+(() => {
+  $$(".rule__img").forEach((fig, k) => {
+    const p = byId[fig.dataset.cycle];
+    if (!p) return;
+    fig.innerHTML = p.images.map((src, j) => `<img src="${src}" alt="" loading="lazy" class="${j === 0 ? "is-on" : ""}" />`).join("");
+    if (reduceMotion) return;
+    const ims = $$("img", fig);
+    let on = 0;
+    setTimeout(() => setInterval(() => { ims[on].classList.remove("is-on"); on = 1 - on; ims[on].classList.add("is-on"); }, 3000), k * 900);
+  });
+})();
+
+/* ───────── ethos: numbers count up once ───────── */
+(() => {
+  const els = $$("[data-count]");
+  if (reduceMotion || !("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target);
+    const end = Number(e.target.dataset.count), t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / 1400);
+      e.target.textContent = Math.round(end * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    e.target.textContent = "0";
+    requestAnimationFrame(step);
+  }), { threshold: 0.6 });
+  els.forEach((el) => io.observe(el));
 })();
 
 /* ───────── marquee ───────── */
@@ -137,7 +287,7 @@ function toggleWish(id, force) {
   const list = [...state.wish];
   saveChain = saveChain.then(() => store.saveWishlist(list)).catch((err) => {
     console.error("[RUMOAR] wishlist save failed", err);
-    toast("Couldn’t sync your wishlist — it’s saved on this device.");
+    toast("Couldn’t sync your wishlist. It’s saved on this device.");
   });
 }
 function syncWishUI(id) {

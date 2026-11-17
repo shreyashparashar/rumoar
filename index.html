@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>RUMOAR — Who are you today?</title>
+  <title>RUMOAR · Who are you today?</title>
   <meta name="description" content="RUMOAR is a design-first men's accessories house. Drop 01: fifteen bags, each a character. Join the list, build your wishlist, hear first at launch." />
-  <meta name="theme-color" content="#E8401C" />
-  <meta property="og:title" content="RUMOAR — Who are you today?" />
+  <meta name="theme-color" content="#140604" />
+  <meta property="og:title" content="RUMOAR · Who are you today?" />
   <meta property="og:description" content="Drop 01: fifteen bags, each a character. Join the list and hear first at launch." />
   <meta property="og:image" content="assets/og.jpg" />
   <meta property="og:type" content="website" />
@@ -14,15 +14,15 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet" />
-  <link rel="preload" as="image" href="assets/hero-vanguard.webp" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="assets/hero/vanguard.webp" />
   <link rel="stylesheet" href="css/style.css" />
   <script>document.documentElement.classList.add("js");</script>
 </head>
 <body>
   <a class="skip" href="#collection">Skip to collection</a>
 
-  <!-- ───────── NAV ───────── -->
+  <!-- NAV -->
   <header class="nav" id="nav">
     <a class="nav__logo" href="#top" aria-label="RUMOAR home">RUMOAR</a>
     <nav class="nav__links" aria-label="Main">
@@ -40,92 +40,109 @@
   </header>
 
   <main id="top">
-    <!-- ───────── HERO ───────── -->
-    <section class="hero" aria-label="RUMOAR">
-      <div class="hero__grain" aria-hidden="true"></div>
-      <div class="hero__meta">
-        <span>(01)</span><span>Product Ecosystem</span><span>© 2026</span>
+    <!-- HERO -->
+    <section class="hero" data-dark aria-label="RUMOAR Drop 01">
+      <div class="hero__bg" aria-hidden="true">
+        <span class="hero__glow"></span>
+        <span class="hero__glow hero__glow--2"></span>
+        <span class="grain"></span>
       </div>
-      <div class="hero__body">
-        <p class="hero__intro rv">A design-first exploration into emerging men’s accessory culture — fifteen objects, each one a character you can step into.</p>
+
+      <div class="hero__meta">
+        <span>(01) Drop 01</span>
+        <span class="hero__live"><i class="pulse" aria-hidden="true"></i><span id="clock">IST 00:00:00</span></span>
+      </div>
+
+      <div class="hero__left">
+        <p class="hero__intro rv">A design-first exploration into men’s accessory culture. Fifteen objects, each one a character you can step into.</p>
         <div class="hero__cta rv">
-          <button class="btn btn--light" id="heroCta" type="button">Enter the world <span aria-hidden="true">→</span></button>
-          <span class="hero__note">Drop 01 · Wishlist now, hear first</span>
+          <button class="btn btn--cream" id="heroCta" type="button">Enter the world <span aria-hidden="true">→</span></button>
+          <a class="btn btn--ghost" href="#ethos">Our ethos</a>
         </div>
       </div>
-      <figure class="hero__object" aria-hidden="true">
-        <img src="assets/hero-vanguard.webp" alt="" width="667" height="983" fetchpriority="high" />
-      </figure>
-      <h1 class="hero__mark"><span>RUMOAR</span></h1>
+
+      <div class="hero__stage" id="heroStage" aria-hidden="true">
+        <span class="hero__pool"></span>
+        <img class="hero__bag is-on" src="assets/hero/vanguard.webp" alt="" width="667" height="983" fetchpriority="high" />
+        <img class="hero__bag" alt="" width="667" height="983" />
+      </div>
+
+      <div class="hero__right">
+        <span class="eyebrow eyebrow--light">Today, you are</span>
+        <div class="flap flap--tiles hero__flap" id="heroFlap" role="text"></div>
+        <p class="hero__tag" id="heroTag"></p>
+        <dl class="hero__spec">
+          <div><dt>Object</dt><dd id="heroIdx">01 / 15</dd></div>
+          <div><dt>Form</dt><dd id="heroType"></dd></div>
+          <div><dt>Launch</dt><dd id="heroPrice"></dd></div>
+        </dl>
+      </div>
+
+      <h1 class="hero__mark" aria-label="RUMOAR"><span aria-hidden="true">RUMOAR</span></h1>
     </section>
 
-    <!-- ───────── WHO ARE YOU TODAY ───────── -->
+    <!-- WHO ARE YOU TODAY: the personality rings -->
     <section class="who" id="who">
       <div class="who__top">
-        <span>RUMOAR</span><span>(Styled for life)</span>
+        <span>(02) Multiple personalities</span>
+        <span class="who__hint">Tap the rings</span>
       </div>
-      <h2 class="who__title">
-        <span class="who__line rv">Who <em>are</em></span>
-        <span class="who__line who__line--r rv">you <em>today?</em></span>
-      </h2>
-
-      <div class="who__stage">
-        <button class="who__card" id="whoCard" type="button" aria-live="polite">
-          <span class="who__imgs">
-            <img id="whoImgA" alt="" width="1000" height="1139" />
-            <img id="whoImgB" alt="" width="1000" height="1139" />
-          </span>
-          <span class="who__caption">
-            <span class="who__today">Today, I’m</span>
-            <span class="who__name" id="whoName">The Maverick</span>
-            <span class="who__line2" id="whoLine">For the days you’d rather be seen.</span>
-          </span>
-        </button>
-        <div class="who__copy">
-          <p class="rv">Explore curated objects, exclusive drops and everyday essentials — all thoughtfully chosen, all in one place. Every bag in Drop 01 is a character. Pick the one you are today; tomorrow, pick again.</p>
-          <div class="who__stat rv">
-            <span class="who__num">15</span>
-            <span class="who__label">objects<br/>to express you</span>
-          </div>
-          <a class="link-arrow rv" href="#collection">Scroll to enter the world <span aria-hidden="true">↓</span></a>
-        </div>
+      <h2 class="who__title rv">Who are <em>you today?</em></h2>
+      <div class="rings" id="rumoar-rings" role="img" aria-label="RUMOAR is multiple personalities: three rotating rings of heads, torsos with bags and legs lock together into six personalities, from The Weekender to The Strategist"><canvas></canvas></div>
+      <div class="who__now">
+        <span class="eyebrow">Right now</span>
+        <div class="flap flap--tiles flap--light who__flap" id="ringFlap" role="text"></div>
+        <a class="link-arrow" href="#collection">Find the bag for him <span aria-hidden="true">↓</span></a>
       </div>
     </section>
 
-    <!-- ───────── MARQUEE ───────── -->
-    <div class="marquee" aria-hidden="true"><div class="marquee__track" id="marquee"></div></div>
+    <!-- MARQUEE -->
+    <div class="marquee" data-dark aria-hidden="true"><div class="marquee__track" id="marquee"></div></div>
 
-    <!-- ───────── ETHOS ───────── -->
-    <section class="ethos" id="ethos">
+    <!-- ETHOS -->
+    <section class="ethos" id="ethos" data-dark>
+      <div class="ethos__glow" aria-hidden="true"></div>
       <div class="ethos__head">
-        <span class="eyebrow">● Ethos</span><span class="eyebrow">© 2026</span>
+        <span><i class="pulse" aria-hidden="true"></i> Ethos</span><span>(03)</span>
       </div>
-      <h2 class="ethos__title rv">Designing a world,<br/><em>not just a product.</em></h2>
-      <p class="ethos__lead rv">RUMOAR is imagined as a design-first ecosystem where every object — from a bag to a fragrance — shares one philosophy: you shouldn’t have to dress like everyone else to look put-together. We make the pieces that finish a look and make it yours.</p>
-      <ol class="pillars">
-        <li class="pillar rv">
-          <span class="pillar__n">(01)</span>
-          <h3>Styled, not stocked.</h3>
-          <p>We design in outfits first and objects second. Every piece is made to complete a look, not fill a shelf.</p>
+
+      <p class="ethos__kicker rv">Designing a world, <em>not just a product.</em></p>
+
+      <p class="manifesto" id="manifesto">We don’t make bags. We make characters. The man who walks into the room with <span class="hl">The Provocateur</span> is not the man who leaves with <span class="hl">The Drifter</span>. RUMOAR is built for both of him, and for every version in between.</p>
+
+      <ol class="rules">
+        <li class="rule rv">
+          <span class="rule__n">01</span>
+          <h3 class="rule__t">Styled, <em>not stocked.</em></h3>
+          <p class="rule__p">We design in outfits first and objects second. Every piece exists to finish a look, never to fill a shelf.</p>
+          <figure class="rule__img" data-cycle="provocateur"></figure>
         </li>
-        <li class="pillar rv">
-          <span class="pillar__n">(02)</span>
-          <h3>Made in small runs.</h3>
-          <p>Each design is produced in limited batches, so what you carry stays yours and doesn’t turn up on every street.</p>
+        <li class="rule rv">
+          <span class="rule__n">02</span>
+          <h3 class="rule__t">Rare <em>by design.</em></h3>
+          <p class="rule__p">Each design is made in small batches, so what you carry stays yours and doesn’t turn up on every street.</p>
+          <figure class="rule__img" data-cycle="drifter"></figure>
         </li>
-        <li class="pillar rv">
-          <span class="pillar__n">(03)</span>
-          <h3>Members hear first.</h3>
-          <p>Drop 01 isn’t on sale yet. Build your wishlist now and you’ll be the first to know the moment it opens.</p>
+        <li class="rule rv">
+          <span class="rule__n">03</span>
+          <h3 class="rule__t">One bag <em>for every you.</em></h3>
+          <p class="rule__p">The Weekender, the Commuter, the Strategist. You are all of them by Friday. Drop 01 gives each one something to carry.</p>
+          <figure class="rule__img" data-cycle="chameleon"></figure>
         </li>
       </ol>
+
+      <div class="stats">
+        <div class="stat rv"><b data-count="15">15</b><span>Objects</span></div>
+        <div class="stat rv"><b data-count="6">6</b><span>Personalities</span></div>
+        <div class="stat rv"><b>1</b><span>You, different every day</span></div>
+      </div>
     </section>
 
-    <!-- ───────── COLLECTION ───────── -->
+    <!-- COLLECTION -->
     <section class="collection is-locked" id="collection" aria-labelledby="colTitle">
       <div class="collection__head">
         <div>
-          <span class="eyebrow">(02) — Drop 01</span>
+          <span class="eyebrow">(04) Drop 01</span>
           <h2 id="colTitle" class="collection__title">The Collection</h2>
         </div>
         <div class="filters" role="tablist" aria-label="Filter collection" id="filters"></div>
@@ -145,38 +162,41 @@
       </div>
     </section>
 
-    <!-- ───────── CLOSER ───────── -->
-    <section class="closer">
-      <div class="hero__grain" aria-hidden="true"></div>
+    <!-- CLOSER -->
+    <section class="closer" data-dark>
+      <div class="hero__bg" aria-hidden="true"><span class="hero__glow hero__glow--closer"></span><span class="grain"></span></div>
       <span class="eyebrow eyebrow--light">Drop 01 · Launching soon</span>
       <h2 class="closer__title rv">Your look<br/><em>is waiting.</em></h2>
-      <button class="btn btn--light" type="button" id="closerCta">Join the list <span aria-hidden="true">→</span></button>
+      <div class="closer__cta">
+        <button class="btn btn--cream" type="button" id="closerCta">Join the list <span aria-hidden="true">→</span></button>
+        <a class="btn btn--ghost" href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Follow @rumoarr</a>
+      </div>
     </section>
   </main>
 
-  <footer class="foot">
+  <footer class="foot" data-dark>
     <div class="foot__row">
       <p>Designing a world, not just a product.</p>
       <nav aria-label="Footer">
-        <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a>
         <a href="#collection">Collection</a>
         <a href="#ethos">Ethos</a>
       </nav>
     </div>
     <div class="foot__mark" aria-hidden="true">RUMOAR</div>
     <div class="foot__row foot__row--small">
-      <span>© 2026 Rahuda Pvt Ltd</span>
-      <span>Made in India</span>
+      <span>© 2026 RUMOAR</span>
+      <span>Designed in India</span>
     </div>
   </footer>
 
-  <!-- ───────── SIGN-UP MODAL ───────── -->
+  <!-- SIGN-UP MODAL -->
   <div class="modal" id="signup" role="dialog" aria-modal="true" aria-labelledby="signupTitle" hidden>
     <div class="modal__scrim" data-close></div>
     <div class="modal__panel signup">
       <button class="modal__x" type="button" data-close aria-label="Close">×</button>
       <div class="signup__side" aria-hidden="true">
-        <div class="hero__grain"></div>
+        <div class="hero__bg"><span class="hero__glow hero__glow--panel"></span><span class="grain"></span></div>
         <span class="signup__mark">RUMOAR</span>
         <span class="signup__tag">Who are<br/><em>you today?</em></span>
       </div>
@@ -220,7 +240,7 @@
     </div>
   </div>
 
-  <!-- ───────── PRODUCT MODAL ───────── -->
+  <!-- PRODUCT MODAL -->
   <div class="modal" id="product" role="dialog" aria-modal="true" aria-labelledby="pName" hidden>
     <div class="modal__scrim" data-close></div>
     <div class="modal__panel pd">
@@ -244,7 +264,7 @@
     </div>
   </div>
 
-  <!-- ───────── WISHLIST DRAWER ───────── -->
+  <!-- WISHLIST DRAWER -->
   <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
     <div class="modal__scrim" data-close></div>
     <aside class="drawer__panel">

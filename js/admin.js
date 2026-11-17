@@ -40,7 +40,7 @@ async function boot() {
       const snap = await F.getDocs(F.query(F.collection(db, "members"), F.orderBy("createdAt", "desc")));
       render(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     } catch (e) {
-      alertBox("Couldn’t read members: " + e.message + " — check the admin email in firestore.rules.");
+      alertBox("Couldn’t read members: " + e.message + ". Check the admin email in firestore.rules.");
     }
   });
 }
@@ -59,7 +59,7 @@ function render(rows) {
     <section class="stats">
       <div class="stat"><span>Members</span><strong>${rows.length}</strong></div>
       <div class="stat"><span>Wishlist adds</span><strong>${totalWish}</strong></div>
-      <div class="stat"><span>Top piece</span><strong style="font-size:20px;font-weight:500">${esc(ranked[0]?.n ? ranked[0].p.name : "—")}</strong></div>
+      <div class="stat"><span>Top piece</span><strong style="font-size:20px;font-weight:500">${esc(ranked[0]?.n ? ranked[0].p.name : "None yet")}</strong></div>
       <div class="stat" style="display:grid;align-content:center"><button class="ink" id="csv">Download CSV</button></div>
     </section>
     <section><h2>Most wishlisted</h2><div class="bars">${ranked.map(({ p, n }) =>

@@ -2,7 +2,7 @@
 //  RUMOAR · Drop 01 catalogue
 //  Edit this file to change names, copy, prices or order.
 //  Images live in /assets/products/<id>-front.webp and -side.webp
-//  NOTE: finishes are described from the renders — confirm the
+//  NOTE: finishes are described from the renders. Confirm the
 //  final materials with production before launch.
 // ─────────────────────────────────────────────────────────────
 
@@ -147,7 +147,7 @@ export const PRODUCTS = [
     price: 3949,
     tagline: "For negotiations, formal or otherwise.",
     description:
-      "A doctor-bag silhouette in padded gunmetal satin, held by a rolled leather handle and a sculpted turn-lock. Side buckles let it open wide or pull in slim. Inside, a tan-lined zip pocket — the detail only you will know about.",
+      "A doctor-bag silhouette in padded gunmetal satin, held by a rolled leather handle and a sculpted turn-lock. Side buckles let it open wide or pull in slim. Inside sits a tan-lined zip pocket: the detail only you will know about.",
     details: [
       "Sculpted turn-lock closure",
       "Side buckles adjust the profile",
@@ -266,7 +266,7 @@ export const PRODUCTS = [
     price: 3549,
     tagline: "For travelling light, and fast.",
     description:
-      "Two zip pockets on a wide leather-finish belt, the RUMOAR name embossed tonal across the front, silver chain pulls for a little edge. Wear it at the waist, or loosen it and sling it across — a belt bag that knows it’s an accessory.",
+      "Two zip pockets on a wide leather-finish belt, the RUMOAR name embossed tonal across the front, silver chain pulls for a little edge. Wear it at the waist, or loosen it and sling it across. A belt bag that knows it’s an accessory.",
     details: [
       "Twin zip compartments",
       "Tonal embossed logo",

@@ -79,7 +79,7 @@ export function createStore() {
       const { auth, db, fs } = await firebase();
       const uid = auth.currentUser.uid;
       if (uid !== member.uid) {
-        // Browser lost its anonymous session (storage cleared) — re-file the member.
+        // Browser lost its anonymous session (storage cleared), so re-file the member.
         member = { ...member, uid: await upsertRemote({ ...member, wishlist }) };
         write(LS_MEMBER, member);
         return;
