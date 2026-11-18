@@ -109,6 +109,25 @@ em { font-style: normal; }
 @keyframes flip { from { transform: rotateX(80deg); opacity: 0.5; } to { transform: none; opacity: 1; } }
 
 /* ── intro ───────────────────────────────────────────────── */
+/* ── the gate: one button on black ───────────────────────── */
+html.is-gate, html.is-gate body { overflow: hidden; }
+.gate0 { position: fixed; inset: 0; z-index: 140; display: grid; place-items: center; background: #000; transition: background 0.6s var(--ease) 0.4s; }
+html:not(.js) .gate0 { display: none; }
+.gate0__btn { position: relative; display: inline-flex; align-items: center; gap: 12px; padding: 16px 28px; border: 1px solid rgba(246, 239, 230, 0.55); border-radius: 999px; background: transparent; color: var(--cream); font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer; transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.5s var(--ease), opacity 0.4s; animation: gateIn 1s var(--ease) both 0.2s; }
+.gate0__btn::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; border: 1px solid var(--orange-2); opacity: 0; animation: gateRing 2.4s ease-out infinite 1.2s; pointer-events: none; }
+.gate0__btn:hover, .gate0__btn:focus-visible { background: var(--cream); color: #000; border-color: var(--cream); outline: none; }
+.gate0__eq { display: inline-flex; align-items: center; gap: 2px; height: 14px; }
+.gate0__eq i { width: 2px; height: 4px; border-radius: 1px; background: currentColor; animation: eq 1.1s ease-in-out infinite; }
+.gate0__eq i:nth-child(2) { animation-delay: -0.35s; } .gate0__eq i:nth-child(3) { animation-delay: -0.7s; } .gate0__eq i:nth-child(4) { animation-delay: -0.2s; }
+/* pressing it: the button bursts into an orange ring that floods the screen, then hands over */
+.gate0::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--orange); transform: scale(0); opacity: 0; pointer-events: none; }
+.gate0.is-go::after { animation: gateBurst 1s var(--ease) forwards; }
+.gate0.is-go .gate0__btn { transform: scale(0.9); opacity: 0; }
+.gate0.is-go { background: transparent; pointer-events: none; }
+@keyframes gateIn { from { opacity: 0; transform: translateY(8px); } }
+@keyframes gateRing { 0% { opacity: 0.7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.5, 1.9); } }
+@keyframes gateBurst { 0% { transform: scale(0); opacity: 1; } 55% { opacity: 1; } 100% { transform: scale(260); opacity: 0; } }
+
 .intro { position: fixed; inset: 0; z-index: 120; background: #050101; display: none; cursor: pointer; overflow: hidden; }
 html.is-intro .intro { display: block; }
 .intro__ui { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; align-content: space-between; padding: 22px var(--gut); color: rgba(246, 239, 230, 0.5); font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; pointer-events: none; opacity: 0; transition: opacity 0.6s; }

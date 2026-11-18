@@ -153,4 +153,22 @@ onMember(joinUI);
 joinUI();
 
 armReveals();
-runIntro(() => hero.start(), () => hero.start());
+/* ───────── the gate: one button on black. It turns the sound on and starts everything ───────── */
+(() => {
+  const gate = $("#gate"), btn = $("#gateBtn");
+  // warm up the first faces while the button waits
+  ["f0", "f1", "f2"].forEach((n) => { const im = new Image(); im.src = `assets/intro/${n}.webp`; });
+  let gone = false;
+  const go = () => {
+    if (gone) return; gone = true;
+    document.dispatchEvent(new CustomEvent("rumoar:sound-on"));
+    gate.classList.add("is-go");
+    setTimeout(() => {
+      document.documentElement.classList.remove("is-gate");
+      runIntro(() => hero.start(), () => hero.start());
+    }, 650);
+    setTimeout(() => gate.remove(), 1500);
+  };
+  btn.addEventListener("click", go);
+  addEventListener("keydown", (e) => { if (!gone && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); go(); } });
+})();

@@ -21,11 +21,18 @@
       var d = document.documentElement; d.classList.add("js");
       var seen = false; try { seen = sessionStorage.getItem("rumoar.intro.v3") === "1"; } catch (e) {}
       if (!seen && !matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("is-intro");
+      d.classList.add("is-gate");
     })();
   </script>
 </head>
 <body data-page="home">
   <a class="skip" href="#bags">Skip to content</a>
+
+  <div class="gate0" id="gate">
+    <button class="gate0__btn" id="gateBtn" type="button" aria-label="Enter RUMOAR with sound">
+      <span class="gate0__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Enter
+    </button>
+  </div>
 
   <div class="intro" id="intro" aria-hidden="true">
     <div class="intro__ui"><span>RUMOAR</span><span>2026</span><span>Tap to skip</span><span data-clock>IST</span></div>

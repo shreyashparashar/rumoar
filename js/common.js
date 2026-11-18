@@ -415,7 +415,15 @@ export function armReveals() {
     if (!wantOn) return;
     start().then((ok) => { if (ok) EVENTS.forEach((t) => removeEventListener(t, kick, true)); });
   };
-  if (wantOn) start().then((ok) => { if (!ok) EVENTS.forEach((t) => addEventListener(t, kick, { capture: true, passive: true })); });
+  // on the homepage the entry button starts the music, so it lands exactly on that tap
+  const gated = !!document.getElementById("gate");
+  if (wantOn && !gated) start().then((ok) => { if (!ok) EVENTS.forEach((t) => addEventListener(t, kick, { capture: true, passive: true })); });
+  // the entry button on the homepage always means "with sound"
+  document.addEventListener("rumoar:sound-on", () => {
+    wantOn = true;
+    try { localStorage.setItem(KEY, "on"); } catch {}
+    ui(true); start();
+  });
   addEventListener("pagehide", () => { try { sessionStorage.setItem("rumoar.sound.t", String(audio.currentTime)); } catch {} });
   document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn) audio.play().catch(() => {}); });
 })();
