@@ -378,12 +378,13 @@ export function armReveals() {
   setTimeout(() => els.forEach((el) => el.classList.add("in")), 4000);
 }
 
-/* ───────── soundtrack: starts on the first tap / key, small toggle in the nav ───────── */
+/* ───────── soundtrack: on by default, the nav toggle only turns it off ───────── */
 (() => {
   const btn = $("#navSound");
+  const KEY = "rumoar.sound.v2";
   const audio = Object.assign(new Audio("assets/audio/soundtrack.mp3"), { loop: true, preload: "auto", volume: 0 });
   let wantOn = true;
-  try { wantOn = localStorage.getItem("rumoar.sound") !== "off"; } catch {}
+  try { wantOn = localStorage.getItem(KEY) !== "off"; } catch {}
   try { const t = Number(sessionStorage.getItem("rumoar.sound.t")); if (t) audio.currentTime = t; } catch {}
   let fade;
   const ramp = (to, ms, done) => {
@@ -395,45 +396,28 @@ export function armReveals() {
       if (k >= 1) { clearInterval(fade); done?.(); }
     }, 30);
   };
-  const ui = (on) => { btn.setAttribute("aria-pressed", on); btn.setAttribute("aria-label", on ? "Sound off" : "Sound on"); btn.classList.toggle("is-on", on); };
-  const start = () => audio.play().then(() => { ui(true); ramp(0.2, 2200); return true; }).catch(() => false);
-  const stop = () => { ui(false); ramp(0, 400, () => audio.pause()); };
+  const ui = (on) => { btn.setAttribute("aria-pressed", on); btn.setAttribute("aria-label", on ? "Turn sound off" : "Turn sound on"); btn.classList.toggle("is-on", on); };
+  const start = () => { if (!audio.paused) return Promise.resolve(true); return audio.play().then(() => { ramp(0.2, 2200); return true; }).catch(() => false); };
+  const stop = () => ramp(0, 400, () => audio.pause());
+  ui(wantOn);
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
-    wantOn = audio.paused;
-    try { localStorage.setItem("rumoar.sound", wantOn ? "on" : "off"); } catch {}
+    wantOn = !wantOn;
+    try { localStorage.setItem(KEY, wantOn ? "on" : "off"); } catch {}
+    ui(wantOn);
     wantOn ? start() : stop();
   });
-  ui(false);
-  if (wantOn) {
-    start().then((ok) => {
-      if (ok) return;
-      // browsers only allow sound after the visitor interacts once
-      const kick = (e) => { if (e.target.closest?.("#navSound, .soundask")) return; if (wantOn && audio.paused) start(); ["pointerdown", "keydown", "touchend"].forEach((t) => removeEventListener(t, kick, true)); };
-      ["pointerdown", "keydown", "touchend"].forEach((t) => addEventListener(t, kick, true));
-    });
-  }
-  // first visit: a small card asks before anything plays
-  let asked = null;
-  try { asked = localStorage.getItem("rumoar.sound"); } catch {}
-  if (!asked && document.getElementById("hero")) {
-    const card = document.createElement("div");
-    card.className = "soundask"; card.setAttribute("role", "dialog"); card.setAttribute("aria-label", "Sound");
-    card.innerHTML = `<span class="soundask__eq" aria-hidden="true"><i></i><i></i><i></i></span><span><b>Sound on?</b><small>It hits different with sound.</small></span><button class="soundask__no" type="button">Later</button><button class="soundask__yes" type="button">Turn on</button>`;
-    document.body.appendChild(card);
-    const close = (on) => {
-      wantOn = on;
-      try { localStorage.setItem("rumoar.sound", on ? "on" : "off"); } catch {}
-      on ? start() : stop();
-      card.classList.remove("is-in"); setTimeout(() => card.remove(), 700);
-    };
-    card.querySelector(".soundask__yes").addEventListener("click", () => close(true));
-    card.querySelector(".soundask__no").addEventListener("click", () => close(false));
-    setTimeout(() => { if (audio.paused && card.isConnected) card.classList.add("is-in"); }, document.getElementById("intro") ? 4600 : 1400);
-    audio.addEventListener("playing", () => { if (card.isConnected) { card.classList.remove("is-in"); setTimeout(() => card.remove(), 700); } }, { once: true });
-  }
+  // play straight away; if the browser holds sound back until the visitor
+  // touches the page, the very first tap, click or key press starts it
+  const EVENTS = ["pointerdown", "pointerup", "click", "touchstart", "touchend", "keydown", "mousedown"];
+  const kick = (e) => {
+    if (e.target.closest?.("#navSound")) return;
+    if (!wantOn) return;
+    start().then((ok) => { if (ok) EVENTS.forEach((t) => removeEventListener(t, kick, true)); });
+  };
+  if (wantOn) start().then((ok) => { if (!ok) EVENTS.forEach((t) => addEventListener(t, kick, { capture: true, passive: true })); });
   addEventListener("pagehide", () => { try { sessionStorage.setItem("rumoar.sound.t", String(audio.currentTime)); } catch {} });
-  document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn && btn.classList.contains("is-on")) audio.play().catch(() => {}); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn) audio.play().catch(() => {}); });
 })();
 
 /* ───────── boot ───────── */
