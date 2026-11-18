@@ -397,7 +397,7 @@ export function armReveals() {
     }, 30);
   };
   const ui = (on) => { btn.setAttribute("aria-pressed", on); btn.setAttribute("aria-label", on ? "Sound off" : "Sound on"); btn.classList.toggle("is-on", on); };
-  const start = () => audio.play().then(() => { ui(true); ramp(0.55, 1600); return true; }).catch(() => false);
+  const start = () => audio.play().then(() => { ui(true); ramp(0.28, 1800); return true; }).catch(() => false);
   const stop = () => { ui(false); ramp(0, 400, () => audio.pause()); };
   btn.addEventListener("click", (e) => {
     e.stopPropagation();

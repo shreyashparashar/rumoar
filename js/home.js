@@ -2,14 +2,16 @@
 import { $, $$, reduceMotion, Flap, PRODUCTS, armReveals, onMember } from "./common.js";
 import { runIntro } from "./intro.js";
 import { initHero, pickVideo } from "./hero-gl.js";
+import { initWordmark } from "./wordmark.js";
 
 /* ───────── hero ───────── */
 const heroEl = $("#hero");
 const badge = new Flap($("#heroBadge"), 1);
 const LETTERS = "RUMOAR";
+const wordmark = initWordmark($("#heroWord"));
 const hero = initHero(heroEl, {
   onBeat: (i) => { if (i >= 0) badge.set(LETTERS[i % LETTERS.length]); },
-  onOpeningDone: () => heroEl.classList.add("is-open"),
+  onOpeningDone: () => { heroEl.classList.add("is-open"); wordmark.start(); },
 });
 
 /* ───────── TV wall: every screen keeps changing ───────── */
@@ -58,84 +60,47 @@ const hero = initHero(heroEl, {
   live.forEach((l) => io.observe(l.el));
 })();
 
-/* ───────── RUMOAR wordmark: hover a letter and it turns into film ───────── */
+/* ───────── own the look: a horizontal gallery driven by scroll ───────── */
 (() => {
-  const letters = $$("#wm .wm__l");
-  let active = null, revert, auto;
-  letters.forEach((l) => {
-    const v = Object.assign(document.createElement("video"), { muted: true, loop: true, playsInline: true, preload: "none", poster: `assets/letters/${l.dataset.clip}.jpg` });
-    v.setAttribute("muted", ""); v.setAttribute("playsinline", ""); v.setAttribute("aria-hidden", "true");
-    v.className = "wm__v";
-    l.appendChild(v);
-    l.addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch") show(l); });
-    l.addEventListener("click", () => show(l));
-  });
-  function show(l) {
-    clearTimeout(revert);
-    if (active === l) return;
-    if (active) { active.classList.remove("is-on"); active.querySelector("video").pause(); }
-    active = l;
-    const v = l.querySelector("video");
-    if (!v.src) v.src = pickVideo(`assets/letters/${l.dataset.clip}.mp4`);
-    v.currentTime = 0; v.play().catch(() => {});
-    l.classList.add("is-on");
+  const sec = $("#look"), track = $("#lookTrack"), bg = $("#lookBg"), count = $("#lookCount"), bar = $("#lookBar");
+  const looks = [["16", "Golden hour"], ["17", "After dark"], ["05", "Commute"], ["12", "Statement"], ["18", "Future proof"], ["06", "Colour hit"],
+    ["10", "Chrome"], ["22", "Street"], ["00", "Mirror, mirror"], ["11", "Red room"], ["30", "Denim on denim"], ["13", "Office hours"],
+    ["26", "Rush hour"], ["20", "Neighbourhood"], ["19", "Off duty"], ["29", "Check mate"]];
+  track.innerHTML = looks.map(([id, name], i) => `
+    <figure class="look__card${i % 2 ? " look__card--low" : ""}">
+      <div class="look__img"><img src="assets/collage/${id}.webp" alt="" loading="${i < 4 ? "eager" : "lazy"}" /></div>
+      <figcaption><span>${String(i + 1).padStart(2, "0")}</span>${name}</figcaption>
+    </figure>`).join("");
+  const cards = $$(".look__card", track);
+  let travel = 0, ticking = false;
+  function size() {
+    travel = Math.max(0, track.scrollWidth - innerWidth);
+    sec.style.height = `${travel + innerHeight}px`;
+    update();
   }
-  function clear() { if (active) { active.classList.remove("is-on"); active.querySelector("video").pause(); active = null; } }
-  $("#wm").addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") revert = setTimeout(clear, 1400); });
-  // touch screens have no hover: the letters take turns on their own
-  if (!matchMedia("(hover: hover)").matches && !reduceMotion) {
-    let k = 0;
-    new IntersectionObserver(([e]) => {
-      clearInterval(auto);
-      if (e.isIntersecting) auto = setInterval(() => { show(letters[k % letters.length]); k++; }, 1700);
-    }, { threshold: 0.3 }).observe($("#wm"));
-  }
-})();
-
-/* ───────── own the look: fly through the collage as you scroll ───────── */
-(() => {
-  const sec = $("#look"), field = $("#lookField"), count = $("#lookCount"), bar = $("#lookBar");
-  const ids = ["16", "05", "17", "06", "00", "07", "18", "08", "12", "09", "22", "10", "03", "11", "26", "13", "20", "14", "30", "19", "21", "23", "24", "25", "27", "29"];
-  const GAP = 520, N = ids.length, phone0 = innerWidth < 700;
-  const rnd = (s) => { const x = Math.sin(s * 9301 + 49297) * 233280; return x - Math.floor(x); };
-  const cards = ids.map((id, i) => {
-    const el = document.createElement("figure");
-    el.className = "look__card";
-    el.innerHTML = `<img src="assets/collage/${id}.webp" alt="" loading="${i < 6 ? "eager" : "lazy"}" />`;
-    field.appendChild(el);
-    const side = i % 2 ? 1 : -1;
-    return { el, x: side * ((phone0 ? 0.16 : 0.24) + rnd(i) * 0.24), y: (rnd(i + 40) - 0.5) * 0.62, z: -i * GAP - 300, r: (rnd(i + 80) - 0.5) * 10 };
-  });
-  let mx = 0, my = 0, ticking = false;
-  addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   function update() {
     ticking = false;
-    const r = sec.getBoundingClientRect(), total = sec.offsetHeight - innerHeight;
-    const p = Math.min(1, Math.max(0, -r.top / Math.max(1, total)));
-    const cam = p * (N * GAP + 300);
-    const w = innerWidth, h = innerHeight, phone = w < 700;
-    let nearest = 0;
-    cards.forEach((c, i) => {
-      const z = c.z + cam;
-      const fadeIn = Math.min(1, Math.max(0, (z + 3600) / 1400));
-      const fadeOut = Math.min(1, Math.max(0, (700 - z) / 400));
-      const o = fadeIn * fadeOut;
-      c.el.style.opacity = o.toFixed(3);
-      c.el.style.visibility = o > 0.01 ? "visible" : "hidden";
-      if (o > 0.01) {
-        const x = c.x * w * (phone ? 1.25 : 1) - mx * 40 * (z + 3600) / 3600;
-        const y = c.y * h - my * 30 * (z + 3600) / 3600;
-        c.el.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotate(${c.r}deg)`;
-      }
-      if (z > -GAP) nearest = i;
-    });
-    count.textContent = String(Math.min(N, nearest + 1)).padStart(2, "0");
+    const p = Math.min(1, Math.max(0, -sec.getBoundingClientRect().top / Math.max(1, travel)));
+    track.style.transform = `translate3d(${-p * travel}px, 0, 0)`;
+    bg.style.transform = `translate3d(${-p * 35}%, -50%, 0)`;
     bar.style.transform = `scaleX(${p})`;
-    sec.classList.toggle("is-end", p > 0.92);
+    const mid = innerWidth / 2;
+    let best = 0, bestD = Infinity;
+    cards.forEach((c, i) => {
+      const r = c.getBoundingClientRect();
+      const d = Math.abs(r.left + r.width / 2 - mid);
+      const k = Math.max(0, 1 - d / (innerWidth * 0.6));
+      c.style.setProperty("--k", k.toFixed(3));
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    cards.forEach((c, i) => c.classList.toggle("is-focus", i === best));
+    count.textContent = `${String(best + 1).padStart(2, "0")} / ${cards.length}`;
   }
   addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener("resize", update);
-  update();
+  addEventListener("resize", size);
+  addEventListener("load", size);
+  $$("img", track).forEach((im) => im.addEventListener("load", size, { once: true }));
+  size();
 })();
 
 /* signing up from the homepage takes you straight into the drop */

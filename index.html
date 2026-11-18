@@ -13,7 +13,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <script>
     (function () {
@@ -40,12 +40,10 @@
         <span class="hero__br" data-clock>IST</span>
       </div>
       <div class="hero__badge flap" id="heroBadge" aria-hidden="true"></div>
-      <div class="hero__end">
-        <h1 class="wm" id="wm" aria-label="RUMOAR">
-          <span class="wm__l" data-clip="l1"><span class="wm__g">R</span></span><span class="wm__l" data-clip="l2"><span class="wm__g">U</span></span><span class="wm__l" data-clip="l3"><span class="wm__g">M</span></span><span class="wm__l" data-clip="l4"><span class="wm__g">O</span></span><span class="wm__l" data-clip="l5"><span class="wm__g">A</span></span><span class="wm__l" data-clip="l6"><span class="wm__g">R</span></span>
-        </h1>
-        <div class="hero__cta"><span class="wm__hint">Hover a letter</span><a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a></div>
-      </div>
+      <div class="hero__dim" aria-hidden="true"></div>
+      <div class="hero__word" id="heroWord" aria-hidden="true"><canvas></canvas></div>
+      <h1 class="sr">RUMOAR</h1>
+      <div class="hero__end"><a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a></div>
     </section>
 
     <section class="tv" id="onair" data-dark>
@@ -64,13 +62,17 @@
 
     <section class="look" id="look" data-dark>
       <div class="look__pin">
-        <div class="look__field" id="lookField"></div>
-        <div class="look__title">
-          <span class="label">The mood · <span id="lookCount">01</span> / 26</span>
+        <div class="look__bg" id="lookBg" aria-hidden="true">Own the look · Own the look ·</div>
+        <div class="look__head">
+          <span class="label">The mood</span>
           <h2 class="head">Own the look.</h2>
-          <a class="btn btn--cream look__cta" href="drop.html">Find yours <span aria-hidden="true">→</span></a>
         </div>
-        <div class="look__bar"><i id="lookBar"></i></div>
+        <div class="look__track" id="lookTrack"></div>
+        <div class="look__foot">
+          <span class="label" id="lookCount">01 / 16</span>
+          <div class="look__bar"><i id="lookBar"></i></div>
+          <a class="btn btn--cream" href="drop.html">Find yours <span aria-hidden="true">→</span></a>
+        </div>
       </div>
     </section>
 
