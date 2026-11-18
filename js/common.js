@@ -397,7 +397,7 @@ export function armReveals() {
     }, 30);
   };
   const ui = (on) => { btn.setAttribute("aria-pressed", on); btn.setAttribute("aria-label", on ? "Sound off" : "Sound on"); btn.classList.toggle("is-on", on); };
-  const start = () => audio.play().then(() => { ui(true); ramp(0.28, 1800); return true; }).catch(() => false);
+  const start = () => audio.play().then(() => { ui(true); ramp(0.2, 2200); return true; }).catch(() => false);
   const stop = () => { ui(false); ramp(0, 400, () => audio.pause()); };
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -410,9 +410,28 @@ export function armReveals() {
     start().then((ok) => {
       if (ok) return;
       // browsers only allow sound after the visitor interacts once
-      const kick = (e) => { if (e.target.closest?.("#navSound")) return; if (wantOn && audio.paused) start(); ["pointerdown", "keydown", "touchend"].forEach((t) => removeEventListener(t, kick, true)); };
+      const kick = (e) => { if (e.target.closest?.("#navSound, .soundask")) return; if (wantOn && audio.paused) start(); ["pointerdown", "keydown", "touchend"].forEach((t) => removeEventListener(t, kick, true)); };
       ["pointerdown", "keydown", "touchend"].forEach((t) => addEventListener(t, kick, true));
     });
+  }
+  // first visit: a small card asks before anything plays
+  let asked = null;
+  try { asked = localStorage.getItem("rumoar.sound"); } catch {}
+  if (!asked && document.getElementById("hero")) {
+    const card = document.createElement("div");
+    card.className = "soundask"; card.setAttribute("role", "dialog"); card.setAttribute("aria-label", "Sound");
+    card.innerHTML = `<span class="soundask__eq" aria-hidden="true"><i></i><i></i><i></i></span><span><b>Sound on?</b><small>It hits different with sound.</small></span><button class="soundask__no" type="button">Later</button><button class="soundask__yes" type="button">Turn on</button>`;
+    document.body.appendChild(card);
+    const close = (on) => {
+      wantOn = on;
+      try { localStorage.setItem("rumoar.sound", on ? "on" : "off"); } catch {}
+      on ? start() : stop();
+      card.classList.remove("is-in"); setTimeout(() => card.remove(), 700);
+    };
+    card.querySelector(".soundask__yes").addEventListener("click", () => close(true));
+    card.querySelector(".soundask__no").addEventListener("click", () => close(false));
+    setTimeout(() => { if (audio.paused && card.isConnected) card.classList.add("is-in"); }, document.getElementById("intro") ? 4600 : 1400);
+    audio.addEventListener("playing", () => { if (card.isConnected) { card.classList.remove("is-in"); setTimeout(() => card.remove(), 700); } }, { once: true });
   }
   addEventListener("pagehide", () => { try { sessionStorage.setItem("rumoar.sound.t", String(audio.currentTime)); } catch {} });
   document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn && btn.classList.contains("is-on")) audio.play().catch(() => {}); });
@@ -423,3 +442,29 @@ renderNavName();
 renderCount();
 if (store.mode === "demo") $("#demoPill").hidden = false;
 export { PRODUCTS, CATEGORIES, byId, formatINR };
+
+/* ───────── cursor that tells you what each thing does (mouse only) ───────── */
+(() => {
+  if (!matchMedia("(hover: hover) and (pointer: fine)").matches || reduceMotion) return;
+  const LABELS = [[".hero__word.is-hot", "Play"], ["#sticker", "Drag"], [".set", "Zap"], [".pop__tile", "Flip"], [".look__card", "View"], [".card", "View"]];
+  const cur = document.createElement("div"); cur.className = "cursor"; cur.setAttribute("aria-hidden", "true"); cur.innerHTML = "<span></span>";
+  document.body.appendChild(cur);
+  const label = cur.firstChild;
+  let x = -100, y = -100, cx = x, cy = y, target = null;
+  addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    x = e.clientX; y = e.clientY; target = e.target;
+    cur.classList.add("is-on");
+  }, { passive: true });
+  document.addEventListener("pointerleave", () => cur.classList.remove("is-on"));
+  addEventListener("scroll", () => { target = document.elementFromPoint(x, y); }, { passive: true });
+  const tick = () => {
+    cx += (x - cx) * 0.22; cy += (y - cy) * 0.22;
+    cur.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+    const hit = target && LABELS.find(([s]) => target.closest?.(s));
+    cur.classList.toggle("is-label", !!hit);
+    if (hit && label.textContent !== hit[1]) label.textContent = hit[1];
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();

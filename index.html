@@ -27,9 +27,9 @@
   <a class="skip" href="#onair">Skip to content</a>
 
   <div class="intro" id="intro" aria-hidden="true">
-    <div class="intro__ui"><span>RUMOAR</span><span>Drop 01 · 2026</span><span>Who are you today?</span><span>Tap to skip</span></div>
+    <div class="intro__ui"><span>(Drop 01)</span><span>2026</span><span>Tap to skip</span><span data-clock>IST</span></div>
     <canvas class="intro__blocks"></canvas>
-    <div class="intro__title"><span>R</span><span>U</span><span>M</span><span>O</span><span>A</span><span>R</span></div>
+    <p class="intro__line">Who are you today?</p>
   </div>
 
   <main>
@@ -49,6 +49,16 @@
     <section class="tv" id="onair" data-dark>
       <div class="bar bar--dark"><span><i class="pulse"></i>On air</span><span data-clock>IST</span></div>
       <h2 class="head rv">Every channel is you.</h2>
+      <button class="sticker" id="sticker" type="button" aria-label="RUMOAR sticker. Drag it anywhere.">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <defs><path id="ring" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" /></defs>
+          <circle cx="100" cy="100" r="96" class="sticker__base" />
+          <g class="sticker__spin"><text><textPath href="#ring">WHO ARE YOU TODAY ✦ DROP 01 ✦ RUMOAR ✦ OWN THE LOOK ✦ </textPath></text></g>
+          <text x="100" y="96" text-anchor="middle" class="sticker__big">R</text>
+          <text x="100" y="128" text-anchor="middle" class="sticker__small">DROP 01</text>
+        </svg>
+        <span class="sticker__tip">Play with me</span>
+      </button>
       <div class="tv__wall" id="tvWall">
         <figure class="set set--a" data-ch="video:assets/video/street-a.mp4"></figure>
         <figure class="set set--b" data-ch="word"></figure>
@@ -58,6 +68,17 @@
         <figure class="set set--f" data-ch="video:assets/video/street-b.mp4"></figure>
         <figure class="set set--g" data-ch="img:assets/collage/17.webp|assets/collage/16.webp|assets/collage/18.webp|assets/collage/03.webp"></figure>
       </div>
+    </section>
+
+    <div class="tapes" aria-hidden="true">
+      <div class="tape tape--a"><div class="tape__track" data-tape="WHO ARE YOU TODAY|DROP 01|OWN THE LOOK|BAG IT|RUMOAR|STYLED NOT STOCKED"></div></div>
+      <div class="tape tape--b"><div class="tape__track" data-tape="15 OBJECTS|6 PERSONALITIES|1 YOU|MEMBERS FIRST|WISHLIST NOW|HEAR FIRST"></div></div>
+    </div>
+
+    <section class="pop" id="pop" data-dark>
+      <div class="bar bar--dark"><span><i class="pulse"></i>8 moods</span><span>1 you</span></div>
+      <h2 class="head rv">Same you. Different day.</h2>
+      <div class="pop__grid" id="popGrid"></div>
     </section>
 
     <section class="look" id="look" data-dark>

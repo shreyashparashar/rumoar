@@ -111,16 +111,12 @@ html.is-intro .intro { display: block; }
 .intro__ui::before, .intro__ui::after { content: ""; position: absolute; left: var(--gut); right: var(--gut); height: 1px; background: rgba(246, 239, 230, 0.12); }
 .intro__ui::before { top: 54px; } .intro__ui::after { bottom: 54px; }
 .intro.is-live .intro__ui { opacity: 1; }
-.intro__blocks { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%); image-rendering: auto; }
-.intro.is-title .intro__blocks { opacity: 0; }
-.intro__title { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; justify-content: center; font-size: var(--fs-mark); font-weight: 600; letter-spacing: -0.05em; line-height: 0.8; pointer-events: none; }
-.intro__title span { color: #e5341f; opacity: 0; transform: scale(1.5) translateY(-6%); transition: opacity 0.12s, transform 0.35s cubic-bezier(0.2, 1.4, 0.4, 1), color 0.45s; }
-.intro__title span.in { opacity: 1; transform: none; }
-.intro.is-cream .intro__title span { color: var(--cream); }
-.intro.is-cream .intro__title span:nth-child(2) { transition-delay: 0s, 0s, 0.06s; } .intro.is-cream .intro__title span:nth-child(3) { transition-delay: 0s, 0s, 0.12s; }
-.intro.is-cream .intro__title span:nth-child(4) { transition-delay: 0s, 0s, 0.18s; } .intro.is-cream .intro__title span:nth-child(5) { transition-delay: 0s, 0s, 0.24s; } .intro.is-cream .intro__title span:nth-child(6) { transition-delay: 0s, 0s, 0.3s; }
-.intro.is-leaving { animation: introOut 0.75s var(--ease) both; }
-@keyframes introOut { to { opacity: 0; transform: scale(1.04); visibility: hidden; } }
+.intro__blocks { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro__line { position: absolute; left: 0; right: 0; bottom: 84px; margin: 0; text-align: center; color: var(--cream); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.32em; text-transform: uppercase; pointer-events: none; opacity: 0; transform: translateY(8px); transition: opacity 0.6s var(--ease) 0.5s, transform 0.6s var(--ease) 0.5s; }
+.intro.is-live .intro__line { opacity: 1; transform: none; }
+.intro__line.is-out { opacity: 0 !important; transform: translateY(-8px) !important; transition-delay: 0s; transition-duration: 0.35s; }
+.intro.is-leaving { background: transparent; cursor: default; }
+.intro.is-leaving .intro__ui { opacity: 0; }
 
 /* ── hero reel ───────────────────────────────────────────── */
 .hero { position: relative; height: 100vh; height: 100svh; min-height: 520px; overflow: hidden; background: var(--ember); color: var(--cream); }
@@ -140,6 +136,8 @@ html.is-intro .intro { display: block; }
 .hero__word { position: absolute; inset: 0; z-index: 2; opacity: 0; transform: scale(1.04); transition: opacity 1.2s var(--ease), transform 1.6s var(--ease); pointer-events: none; }
 .hero__word canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero.is-open .hero__dim, .hero.is-open .hero__word { opacity: 1; transform: none; }
+.hero.is-open .hero__word { pointer-events: auto; }
+.hero__word.is-hot { cursor: none; }
 .hero__end { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 0 var(--gut) 34px; display: flex; justify-content: center; opacity: 0; transform: translateY(14px); transition: opacity 0.8s var(--ease) 0.6s, transform 0.8s var(--ease) 0.6s; pointer-events: none; }
 .hero.is-open .hero__end { opacity: 1; transform: none; }
 .hero.is-open .hero__end .btn { pointer-events: auto; }
@@ -337,3 +335,68 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-app
 .js .rv.armed.in { opacity: 1; transform: none; transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; } }
 .hero__ui { transition: opacity 0.6s; } .hero.is-open .hero__ui { opacity: 0; }
+
+/* ── live: sticker you can throw ─────────────────────────── */
+.sticker { position: absolute; left: 0; top: 0; z-index: 5; width: clamp(92px, 11vw, 150px); aspect-ratio: 1; padding: 0; border: 0; background: none; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; will-change: transform; filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.5)); }
+.sticker.is-drag { cursor: grabbing; filter: drop-shadow(0 30px 34px rgba(0, 0, 0, 0.6)); }
+.sticker svg { width: 100%; height: 100%; display: block; overflow: visible; transition: transform 0.4s var(--ease); }
+.sticker.is-drag svg, .sticker:hover svg { transform: scale(1.06); }
+.sticker__base { fill: var(--orange); stroke: var(--cream); stroke-width: 4; }
+.sticker__spin { transform-origin: 100px 100px; animation: spin 14s linear infinite; }
+.sticker:hover .sticker__spin { animation-duration: 4s; }
+.sticker__spin text { fill: var(--cream); font-size: 13.4px; font-weight: 600; letter-spacing: 0.16em; }
+.sticker__big { fill: var(--cream); font-size: 64px; font-weight: 700; letter-spacing: -0.04em; }
+.sticker__small { fill: var(--ember); font-size: 12px; font-weight: 700; letter-spacing: 0.2em; }
+.sticker__tip { position: absolute; left: 50%; top: 100%; margin-top: 8px; transform: translateX(-50%); white-space: nowrap; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-2); pointer-events: none; transition: opacity 0.3s; }
+.sticker.is-drag .sticker__tip { opacity: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── live: crossing tapes ───────────────────────────────── */
+.tapes { position: relative; height: clamp(120px, 14vw, 190px); background: var(--ember); overflow: hidden; }
+.tape { position: absolute; left: -5%; right: -5%; top: 50%; padding: 14px 0; overflow: hidden; }
+.tape--a { background: var(--orange); color: var(--ember); transform: translateY(-50%) rotate(-4deg); z-index: 2; box-shadow: 0 16px 30px -12px rgba(0, 0, 0, 0.6); }
+.tape--b { background: var(--cream); color: var(--ember); transform: translateY(-50%) rotate(3deg); }
+.tape__track { display: flex; width: max-content; gap: 22px; align-items: center; font-size: clamp(15px, 1.6vw, 22px); font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; animation: tape 38s linear infinite; }
+.tape--b .tape__track { animation-direction: reverse; animation-duration: 46s; }
+.tape__track i { font-style: normal; font-size: 0.7em; }
+.tape:hover .tape__track { animation-play-state: paused; }
+@keyframes tape { to { transform: translateX(-50%); } }
+
+/* ── live: pop-art wall ─────────────────────────────────── */
+.pop { background: var(--ember); color: var(--cream); padding: 28px var(--gut) clamp(64px, 8vw, 110px); }
+.pop .head { margin: clamp(32px, 5vw, 64px) 0 clamp(24px, 3vw, 40px); }
+.pop__grid { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 900px) { .pop__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; } }
+.pop__tile { margin: 0; cursor: pointer; }
+.pop__art { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 6px; background: var(--b); transition: background 0.7s var(--ease), transform 0.5s var(--ease); isolation: isolate; }
+.pop__art::after { content: ""; position: absolute; inset: 0; background: var(--a); mix-blend-mode: screen; transition: background 0.7s var(--ease), opacity 0.45s; z-index: 2; pointer-events: none; }
+.pop__art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; filter: grayscale(1) contrast(1.5) brightness(1.05); }
+.pop__art .pop__real { mix-blend-mode: normal; filter: none; opacity: 0; transform: scale(1.08); transition: opacity 0.45s, transform 0.8s var(--ease); z-index: 3; }
+.pop__tile:hover .pop__art { transform: rotate(-1.5deg) scale(1.02); }
+.pop__tile:hover .pop__real, .pop__tile.is-real .pop__real { opacity: 1; transform: none; }
+.pop__tile figcaption { display: flex; gap: 10px; margin-top: 10px; font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cream-2); }
+.pop__tile figcaption span { color: var(--orange-2); }
+
+/* ── live: cursor that tells you what it does ───────────── */
+.cursor { position: fixed; left: 0; top: 0; z-index: 200; pointer-events: none; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--orange-2); display: grid; place-items: center; color: var(--ember); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; transition: width 0.35s var(--ease), height 0.35s var(--ease), margin 0.35s var(--ease), opacity 0.3s, background 0.3s; opacity: 0; mix-blend-mode: normal; }
+.cursor span { opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+.cursor.is-on { opacity: 1; }
+.cursor.is-label { width: 74px; height: 74px; margin: -37px 0 0 -37px; background: var(--cream); }
+.cursor.is-label span { opacity: 1; }
+@media (hover: none) { .cursor { display: none; } }
+
+/* ── sound prompt ───────────────────────────────────────── */
+.soundask { position: fixed; left: 16px; bottom: 16px; z-index: 90; display: flex; align-items: center; gap: 14px; padding: 12px 12px 12px 16px; border-radius: 16px; background: rgba(20, 8, 5, 0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: var(--cream); box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.7), inset 0 0 0 1px var(--cream-line); font-size: 13px; transform: translateY(140%); transition: transform 0.6s var(--ease); max-width: calc(100vw - 32px); }
+.soundask.is-in { transform: none; }
+.soundask__eq { display: flex; gap: 2px; align-items: end; height: 16px; }
+.soundask__eq i { width: 3px; background: var(--orange-2); animation: eq 0.9s ease-in-out infinite alternate; }
+.soundask__eq i:nth-child(2) { animation-delay: -0.3s; } .soundask__eq i:nth-child(3) { animation-delay: -0.6s; }
+@keyframes eq { from { height: 4px; } to { height: 16px; } }
+.soundask b { font-weight: 600; display: block; }
+.soundask small { color: var(--cream-2); font-size: 12px; }
+.soundask button { white-space: nowrap; }
+@media (max-width: 520px) { .soundask { left: 12px; right: 12px; max-width: none; gap: 10px; } .soundask small { display: none; } .soundask > span:nth-child(2) { flex: 1; } }
+.soundask button { border: 0; border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; }
+.soundask__no { background: transparent; color: var(--cream-2); }
+.soundask__yes { background: var(--cream); color: var(--ember); }
+.soundask__yes:hover { background: var(--orange); color: #fff; }
