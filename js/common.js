@@ -294,7 +294,6 @@ let currentProduct = null;
 export function openProduct(id) {
   const p = byId[id];
   if (!p) return;
-  if (!store.member) { state.pendingProduct = id; return openSignup(); }
   currentProduct = id;
   $("#pMeta").textContent = `${catLabel(p.category)} · ${p.colour}`;
   $("#pName").textContent = p.name;
