@@ -5,7 +5,7 @@
 // block by block into the homepage. No counter. Plays once per session,
 // skippable by click / key, skipped for reduced motion.
 
-const TILES = Array.from({ length: 13 }, (_, i) => `assets/intro/${String(i).padStart(2, "0")}.webp`);
+const TILES = Array.from({ length: 23 }, (_, i) => `assets/intro/${String(i).padStart(2, "0")}.webp`);
 const KEY = "rumoar.intro.v2";
 
 export function runIntro(onDone) {

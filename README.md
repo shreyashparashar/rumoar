@@ -11,15 +11,21 @@ No credit card needed.
 Plain HTML/CSS/JS, no build step, no npm.
 
 ```
-index.html            the landing page
+index.html            homepage: pixel intro, film reel, TV wall, collage strips
+drop.html             Drop 01: sign-up gate, bags, wishlist
 admin.html            private dashboard: sign-ups, wishlists, CSV export
-firebase-config.js    ← the ONE file you edit to connect Firebase
-firestore.rules       ← paste into Firebase to lock the database down
-css/style.css         all styling (colours/fonts at the top)
-js/products.js        ← names, prices, descriptions: edit here
-js/app.js             page behaviour
+firebase-config.js    your Firebase keys (already filled in)
+firestore.rules       paste into Firebase to lock the database down
+css/style.css         all styling; the 4 font sizes are defined at the top
+js/products.js        names, prices, descriptions: edit here
+js/common.js          nav, sign-up, wishlist, product view (shared by both pages)
+js/home.js            homepage behaviour
+js/drop.js            Drop 01 page behaviour
+js/intro.js           the pixel-block intro
+js/hero-gl.js         the film reel (opening sequence + clips list at the top)
 js/store.js           saves sign-ups + wishlists (Firebase or demo mode)
-js/admin.js           admin dashboard logic
+assets/collage/       moodboard photos used across the homepage (swap freely)
+assets/video/         the two street films (MP4 + WebM)
 assets/products/      30 product shots (front + side for 15 bags)
 ```
 

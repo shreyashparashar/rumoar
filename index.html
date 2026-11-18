@@ -9,12 +9,11 @@
   <meta property="og:title" content="RUMOAR · Who are you today?" />
   <meta property="og:description" content="Drop 01: fifteen bags, each a character. Join the list and hear first at launch." />
   <meta property="og:image" content="assets/og.jpg" />
-  <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <script>
     (function () {
@@ -24,264 +23,72 @@
     })();
   </script>
 </head>
-<body>
-  <a class="skip" href="#collection">Skip to collection</a>
+<body data-page="home">
+  <a class="skip" href="#onair">Skip to content</a>
 
-  <!-- INTRO -->
   <div class="intro" id="intro" aria-hidden="true">
     <canvas></canvas>
-    <div class="intro__ui">
-      <span>RUMOAR</span><span>(Drop 01)</span>
-      <span>Who are you today?</span><span>Tap to skip</span>
-    </div>
+    <div class="intro__ui"><span>RUMOAR</span><span>(Drop 01)</span><span>Who are you today?</span><span>Tap to skip</span></div>
   </div>
 
-  <!-- NAV -->
-  <header class="nav" id="nav">
-    <a class="nav__logo" href="#top" aria-label="RUMOAR home">RUMOAR</a>
-    <nav class="nav__links" aria-label="Main">
-      <a href="#who">Who</a>
-      <a href="#channels">On air</a>
-      <a href="#ethos">Ethos</a>
-      <a href="#collection">Collection</a>
-    </nav>
-    <div class="nav__actions">
-      <button class="nav__member" id="navMember" type="button">Join the list</button>
-      <button class="nav__wish" id="navWish" type="button" aria-label="Open wishlist">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.4C1.4 7.6 3.6 4 7.2 4c2 0 3.6 1.1 4.8 2.8C13.2 5.1 14.8 4 16.8 4c3.6 0 5.8 3.6 4.5 7.1-1.8 4.8-9.3 9.4-9.3 9.4z"/></svg>
-        <span class="nav__count" id="wishCount">0</span>
-      </button>
-    </div>
-  </header>
-
-  <main id="top">
-    <!-- 01 STAGE: liquid-lens film that shrinks into a card -->
-    <section class="stage" id="stage" data-dark aria-label="RUMOAR Drop 01">
-      <div class="stage__pin">
-        <div class="stage__frame" id="stageFrame"><canvas aria-hidden="true"></canvas></div>
-
-        <div class="stage__ui" aria-hidden="true">
-          <span class="stage__tl">(01) RUMOAR<br/>Drop 01</span>
-          <span class="stage__tc">Product ecosystem</span>
-          <span class="stage__tr"><i class="pulse"></i> <span id="clock">IST 00:00:00</span></span>
-          <span class="stage__bl">Who are<br/><em>you today?</em></span>
-          <span class="stage__br">Scroll <span class="stage__arrow">↓</span></span>
-        </div>
-
-        <h1 class="stage__mark"><span>RUMOAR</span></h1>
-        <div class="stage__below">
-          <p>A design-first exploration into men’s accessory culture. Fifteen objects, each one a character you can step into.</p>
-          <div class="stage__cta">
-            <button class="btn btn--cream" id="heroCta" type="button">Enter the world <span aria-hidden="true">→</span></button>
-            <a class="btn btn--ghost" href="#channels">Tune in</a>
-          </div>
-        </div>
+  <main>
+    <section class="hero" id="hero" data-dark aria-label="RUMOAR">
+      <div class="hero__film"><canvas aria-hidden="true"></canvas></div>
+      <div class="hero__ui" aria-hidden="true">
+        <span>RUMOAR showcase <i>••</i></span>
+        <span class="hero__tc">Who are you today?</span>
+        <span class="hero__tr"><i>••</i> 2026 · Drop 01</span>
+        <span class="hero__bl">Scroll ↓</span>
+        <span class="hero__br" data-clock>IST</span>
+      </div>
+      <div class="hero__badge flap" id="heroBadge" aria-hidden="true"></div>
+      <div class="hero__end">
+        <h1 class="hero__mark">RUMOAR</h1>
+        <a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a>
       </div>
     </section>
 
-    <!-- 02 WHO ARE YOU TODAY: the personality rings -->
-    <section class="who" id="who">
-      <div class="bar"><span>(02) Multiple personalities</span><span class="hint">Tap the rings</span></div>
-      <h2 class="title rv">Who are <em>you today?</em></h2>
-      <div class="rings" id="rumoar-rings" role="img" aria-label="RUMOAR is multiple personalities: three rotating rings of heads, torsos with bags and legs lock together into six personalities, from The Weekender to The Strategist"><canvas></canvas></div>
-      <div class="who__now">
-        <span class="label">Right now</span>
-        <div class="flap flap--tiles flap--light" id="ringFlap" role="text"></div>
-        <a class="link-arrow" href="#collection">Find the bag for him <span aria-hidden="true">↓</span></a>
-      </div>
-    </section>
-
-    <!-- 03 ON AIR: the TV wall -->
-    <section class="tv" id="channels" data-dark>
-      <div class="bar bar--dark"><span><i class="pulse"></i> (03) On air</span><span id="tvClock">Live</span></div>
-      <div class="tv__head">
-        <h2 class="title rv">Every channel <em>is you.</em></h2>
-        <p class="lead rv">Six personalities, fifteen objects, one wardrobe. Tap a screen to change the channel.</p>
-      </div>
+    <section class="tv" id="onair" data-dark>
+      <div class="bar bar--dark"><span><i class="pulse"></i>On air</span><span data-clock>IST</span></div>
+      <h2 class="head rv">Every channel is you.</h2>
       <div class="tv__wall" id="tvWall">
         <figure class="set set--a" data-ch="video:assets/video/street-a.mp4"></figure>
         <figure class="set set--b" data-ch="word"></figure>
-        <figure class="set set--c" data-ch="img:assets/stills/deck-pixel.webp|assets/stills/deck-glitch.webp|assets/stills/deck-visor.webp"></figure>
+        <figure class="set set--c" data-ch="img:assets/collage/01.webp|assets/collage/04.webp|assets/stills/deck-pixel.webp|assets/collage/02.webp"></figure>
         <figure class="set set--d" data-ch="static"></figure>
         <figure class="set set--e" data-ch="products"></figure>
         <figure class="set set--f" data-ch="video:assets/video/street-b.mp4"></figure>
-        <figure class="set set--g" data-ch="img:assets/stills/street-face.webp|assets/stills/aerial-face.webp|assets/stills/aerial.webp"></figure>
+        <figure class="set set--g" data-ch="img:assets/collage/17.webp|assets/collage/16.webp|assets/collage/18.webp|assets/collage/03.webp"></figure>
       </div>
     </section>
 
-    <!-- 04 ETHOS -->
-    <section class="ethos" id="ethos" data-dark>
-      <div class="bar bar--dark"><span><i class="pulse"></i> (04) Ethos</span><span>Designing a world, not just a product</span></div>
-      <p class="manifesto" id="manifesto">We don’t make bags. We make characters. The man who walks into the room with <span class="hl">The Provocateur</span> is not the man who leaves with <span class="hl">The Drifter</span>. RUMOAR is built for both of him, and for every version in between.</p>
-
-      <ol class="rules">
-        <li class="rule rv">
-          <span class="rule__n">01</span>
-          <h3 class="rule__t">Styled, <em>not stocked.</em></h3>
-          <p class="rule__p">We design in outfits first and objects second. Every piece exists to finish a look, never to fill a shelf.</p>
-          <figure class="rule__img" data-cycle="assets/stills/street-wide.webp|assets/stills/street-face.webp"></figure>
-        </li>
-        <li class="rule rv">
-          <span class="rule__n">02</span>
-          <h3 class="rule__t">Rare <em>by design.</em></h3>
-          <p class="rule__p">Each design is made in small batches, so what you carry stays yours and doesn’t turn up on every street.</p>
-          <figure class="rule__img" data-cycle="assets/stills/deck-visor.webp|assets/stills/deck-pixel.webp"></figure>
-        </li>
-        <li class="rule rv">
-          <span class="rule__n">03</span>
-          <h3 class="rule__t">One bag <em>for every you.</em></h3>
-          <p class="rule__p">The Weekender, the Commuter, the Strategist. You are all of them by Friday. Drop 01 gives each one something to carry.</p>
-          <figure class="rule__img" data-cycle="assets/stills/aerial.webp|assets/stills/aerial-face.webp"></figure>
-        </li>
-      </ol>
-
-      <div class="stats">
-        <div class="stat rv"><b data-count="15">15</b><span class="label">Objects</span></div>
-        <div class="stat rv"><b data-count="6">6</b><span class="label">Personalities</span></div>
-        <div class="stat rv"><b>1</b><span class="label">You, different every day</span></div>
-      </div>
+    <section class="mood" id="mood" data-dark>
+      <div class="bar bar--dark"><span>The mood</span><span>Drop 01</span></div>
+      <h2 class="head rv">Own the look.</h2>
+      <div class="strip" data-strip="05,06,07,08,09,10,11,12,13,14,00"></div>
+      <div class="strip strip--rev" data-strip="16,17,18,19,20,21,22,23,24,25,26,27,28,29,30"></div>
     </section>
 
-    <!-- 05 COLLECTION -->
-    <section class="collection is-locked" id="collection" aria-labelledby="colTitle">
-      <div class="bar"><span>(05) Drop 01</span><span id="colCount">15 objects</span></div>
-      <div class="collection__head">
-        <h2 id="colTitle" class="title">The <em>collection.</em></h2>
-        <div class="filters" role="tablist" aria-label="Filter collection" id="filters"></div>
-      </div>
-
-      <div class="collection__wrap">
-        <ul class="index" id="grid" aria-live="polite"></ul>
-        <div class="gate" id="gate">
-          <div class="gate__card">
-            <span class="label">Members only</span>
-            <h3>Before you enter.</h3>
-            <p>Drop 01 opens to the list first. Tell us who you are and the collection is yours to explore, wishlist, and hear about first.</p>
-            <button class="btn btn--flame" type="button" data-open-signup>Sign up to enter <span aria-hidden="true">→</span></button>
-          </div>
-        </div>
-      </div>
-      <div class="preview" id="preview" aria-hidden="true"><img alt="" /><img alt="" /></div>
-    </section>
-
-    <!-- 06 CLOSER -->
     <section class="closer" data-dark>
-      <img class="closer__bg" src="assets/intro/02.webp" alt="" loading="lazy" />
-      <span class="label label--light">Drop 01 · Launching soon</span>
-      <h2 class="title rv">Your look<br/><em>is waiting.</em></h2>
+      <img class="closer__bg" src="assets/collage/26.webp" alt="" loading="lazy" />
+      <span class="label" style="color: var(--cream-2)">Drop 01 · Launching soon</span>
+      <h2 class="head rv">Your look is waiting.</h2>
       <div class="closer__cta">
-        <button class="btn btn--cream" type="button" id="closerCta">Join the list <span aria-hidden="true">→</span></button>
-        <a class="btn btn--ghost" href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Follow @rumoarr</a>
+        <a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost" href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">@rumoarr</a>
       </div>
     </section>
   </main>
 
   <footer class="foot" data-dark>
     <div class="foot__row">
-      <p>Designing a world, not just a product.</p>
-      <nav aria-label="Footer">
-        <a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a>
-        <a href="#collection">Collection</a>
-        <a href="#ethos">Ethos</a>
-      </nav>
+      <span>Designing a world, not just a product</span>
+      <nav aria-label="Footer"><a href="drop.html">Drop 01</a><a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a></nav>
     </div>
     <div class="foot__mark" aria-hidden="true">RUMOAR</div>
-    <div class="foot__row foot__row--small">
-      <span>© 2026 RUMOAR</span>
-      <span>Designed in India</span>
-    </div>
+    <div class="foot__row"><span>© 2026 RUMOAR</span><span>Designed in India</span></div>
   </footer>
 
-  <!-- SIGN-UP MODAL -->
-  <div class="modal" id="signup" role="dialog" aria-modal="true" aria-labelledby="signupTitle" hidden>
-    <div class="modal__scrim" data-close></div>
-    <div class="modal__panel signup">
-      <button class="modal__x" type="button" data-close aria-label="Close">×</button>
-      <div class="signup__side" aria-hidden="true">
-        <img src="assets/intro/01.webp" alt="" />
-        <span class="signup__mark">RUMOAR</span>
-        <span class="signup__tag">Who are<br/><em>you today?</em></span>
-      </div>
-      <form class="signup__form" id="signupForm" novalidate>
-        <span class="label">Join the list</span>
-        <h2 id="signupTitle">Before you enter.</h2>
-        <p class="signup__lead">Members see the collection first, keep a wishlist, and hear from us the moment Drop 01 goes live.</p>
-
-        <label class="field">
-          <span>Full name</span>
-          <input name="name" autocomplete="name" required maxlength="80" placeholder="Your name" />
-          <small class="field__err"></small>
-        </label>
-        <label class="field">
-          <span>Email</span>
-          <input name="email" type="email" autocomplete="email" inputmode="email" required maxlength="120" placeholder="you@email.com" />
-          <small class="field__err"></small>
-        </label>
-        <div class="field-row">
-          <label class="field">
-            <span>Phone</span>
-            <div class="field__phone"><em>+91</em><input name="phone" type="tel" autocomplete="tel-national" inputmode="tel" required maxlength="16" placeholder="98765 43210" /></div>
-            <small class="field__err"></small>
-          </label>
-          <label class="field field--age">
-            <span>Age</span>
-            <input name="age" type="number" inputmode="numeric" min="13" max="100" required placeholder="25" />
-            <small class="field__err"></small>
-          </label>
-        </div>
-        <label class="field">
-          <span>Favourite superhero or animated character</span>
-          <input name="favCharacter" required maxlength="80" placeholder="The one you’d be for a day" />
-          <small class="field__err"></small>
-        </label>
-
-        <button class="btn btn--ink btn--block" type="submit" id="signupSubmit">Enter RUMOAR <span aria-hidden="true">→</span></button>
-        <p class="signup__fine">We’ll only write to you about RUMOAR launches. No spam, ever.</p>
-        <p class="signup__error" id="signupError" role="alert"></p>
-      </form>
-    </div>
-  </div>
-
-  <!-- PRODUCT MODAL -->
-  <div class="modal" id="product" role="dialog" aria-modal="true" aria-labelledby="pName" hidden>
-    <div class="modal__scrim" data-close></div>
-    <div class="modal__panel pd">
-      <button class="modal__x" type="button" data-close aria-label="Close">×</button>
-      <div class="pd__gallery">
-        <div class="pd__track" id="pdTrack"></div>
-        <div class="pd__dots" id="pdDots"></div>
-        <button class="pd__arrow pd__arrow--l" type="button" data-slide="-1" aria-label="Previous image">←</button>
-        <button class="pd__arrow pd__arrow--r" type="button" data-slide="1" aria-label="Next image">→</button>
-      </div>
-      <div class="pd__info">
-        <span class="label" id="pMeta"></span>
-        <h2 id="pName" class="pd__name"></h2>
-        <p class="pd__tag" id="pTag"></p>
-        <p class="pd__price"><span id="pPrice"></span><small>Launch price</small></p>
-        <p class="pd__desc" id="pDesc"></p>
-        <ul class="pd__details" id="pDetails"></ul>
-        <button class="btn btn--flame btn--block pd__wish" id="pWish" type="button"></button>
-        <p class="pd__fine">Not on sale yet. Wishlisted members hear first when Drop 01 opens.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- WISHLIST DRAWER -->
-  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
-    <div class="modal__scrim" data-close></div>
-    <aside class="drawer__panel">
-      <div class="drawer__head">
-        <h2 id="drawerTitle">Your wishlist</h2>
-        <button class="modal__x modal__x--static" type="button" data-close aria-label="Close">×</button>
-      </div>
-      <ul class="drawer__list" id="drawerList"></ul>
-      <div class="drawer__foot" id="drawerFoot"></div>
-    </aside>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <div class="demo-pill" id="demoPill" hidden>Demo mode · Firebase not connected</div>
-
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/home.js"></script>
 </body>
 </html>

@@ -1,105 +1,139 @@
-// RUMOAR hero: street footage graded into ember tones, seen through a
-// moving liquid-glass lens (refraction, chromatic edges, a hot rim).
-// It opens from black: only the lens shows the film at first, then the
-// lens swells and the whole frame comes up. Clips hard-cut with a pulse.
-// Falls back to a CSS-graded <video> if WebGL isn't available.
+// RUMOAR hero reel (WebGL).
+// The first ~4 seconds are a scripted opening, beat for beat after the
+// reference: a dark liquid shape swirls out of black; an extreme bright
+// close-up through the lens; street footage with zoom blur and a wobbling
+// chrome droplet; a hard cut to a swirl-twisted frame; a fisheye bubble that
+// relaxes into clean footage; a final cut with zoom blur settling. After
+// that the reel keeps cutting between footage and stills, full screen.
+// Everything is graded into RUMOAR's ember tones.
 
-// MP4 (H.264) where supported, WebM (VP9) otherwise.
 const probe = document.createElement("video");
 const MP4_OK = !!probe.canPlayType('video/mp4; codecs="avc1.42E01E"');
 export const pickVideo = (path) => (MP4_OK ? path : path.replace(/\.mp4$/, ".webm"));
-const CLIPS = ["assets/video/street-a.mp4", "assets/video/street-b.mp4"].map(pickVideo);
+
+const V = (n) => ({ kind: "video", src: pickVideo(`assets/video/${n}.mp4`) });
+const I = (n) => ({ kind: "image", src: `assets/collage/${n}.webp` });
+
+// opening beats: [source, duration ms, effect envelope]
+const OPENING = [
+  { ...I("17"), ms: 650, fx: { dark: [1, 1] } },
+  { ...I("18"), ms: 800, fx: { mag: [1, 0.85], zoom: [0.9, 0.5], lift: [0.35, 0.25] } },
+  { ...V("street-a"), ms: 1000, fx: { drop: [1, 1], zoom: [0.45, 0.25] } },
+  { ...I("00"), ms: 550, fx: { swirl: [3.2, 1.2] } },
+  { ...V("street-b"), ms: 750, fx: { fish: [1, 0], dropOut: true } },
+  { ...I("26"), ms: 520, fx: { zoom: [0.9, 0] } },
+];
+// the reel after the opening
+const REEL = [V("street-a"), I("16"), V("street-b"), I("12"), I("22"), I("17"), I("03"), I("11"), I("00")];
 
 const VERT = `attribute vec2 p; varying vec2 v; void main(){ v = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
-
 const FRAG = `
 precision highp float;
 varying vec2 v;
 uniform sampler2D tex;
-uniform vec2 res, texRes, mouse;
-uniform float time, reveal, pulse;
+uniform vec2 res, texRes;
+uniform float time, kb, dark, mag, zoom, drop, swirl, fish, lift, flash;
 
 vec2 cover(vec2 uv){
   float ra = res.x / res.y, ta = texRes.x / texRes.y;
   vec2 s = ra > ta ? vec2(1.0, ta / ra) : vec2(ra / ta, 1.0);
-  return (uv - 0.5) * s + 0.5;
+  return ((uv - 0.5) * s) / kb + 0.5;
 }
 vec3 grade(vec3 c){
   float l = dot(c, vec3(0.299, 0.587, 0.114));
-  l = smoothstep(0.02, 0.98, l);
-  vec3 a = vec3(0.045, 0.012, 0.008), b = vec3(0.50, 0.10, 0.035), m = vec3(0.93, 0.33, 0.10), h = vec3(1.0, 0.86, 0.68);
-  vec3 d = l < 0.38 ? mix(a, b, l / 0.38) : l < 0.72 ? mix(b, m, (l - 0.38) / 0.34) : mix(m, h, (l - 0.72) / 0.28);
-  return mix(c * vec3(1.05, 0.78, 0.62), d, 0.82);
+  l = clamp(l + lift, 0.0, 1.0);
+  vec3 a = vec3(0.04, 0.012, 0.008), b = vec3(0.48, 0.10, 0.035), m = vec3(0.93, 0.34, 0.10), h = vec3(1.0, 0.87, 0.70);
+  vec3 d = l < 0.36 ? mix(a, b, l / 0.36) : l < 0.72 ? mix(b, m, (l - 0.36) / 0.36) : mix(m, h, (l - 0.72) / 0.28);
+  return mix(c * vec3(1.05, 0.8, 0.66) + lift * 0.4, d, 0.72);
 }
-float field(vec2 q){
-  float ar = res.x / res.y;
-  float r = mix(0.10, 0.25, smoothstep(0.0, 0.55, reveal)) * (1.0 + 0.18 * pulse);
-  vec2 c1 = mouse;
-  vec2 c2 = mouse + vec2(0.16 * sin(time * 0.53), 0.11 * cos(time * 0.71));
-  vec2 c3 = mouse + vec2(0.13 * cos(time * 0.37 + 1.7), 0.15 * sin(time * 0.44 + 0.6));
-  float f = r * r / dot(q - c1, q - c1);
-  f += 0.45 * r * r / dot(q - c2, q - c2);
-  f += 0.35 * r * r / dot(q - c3, q - c3);
-  return f;
+vec3 samp(vec2 uv){
+  // radial zoom blur toward the centre
+  vec2 c = cover(uv);
+  if (zoom < 0.01) return texture2D(tex, c).rgb;
+  vec3 acc = vec3(0.0);
+  for (int i = 0; i < 10; i++) {
+    float k = 1.0 - float(i) * zoom * 0.028;
+    acc += texture2D(tex, cover((uv - 0.5) * k + 0.5)).rgb;
+  }
+  return acc / 10.0;
+}
+float field(vec2 q, float r){
+  vec2 c1 = vec2(0.03 * sin(time * 2.1), 0.02 * cos(time * 1.7));
+  vec2 c2 = vec2(0.10 * sin(time * 1.3 + 1.0), 0.07 * cos(time * 1.9));
+  vec2 c3 = vec2(0.09 * cos(time * 1.1 + 2.0), 0.09 * sin(time * 1.5));
+  return r * r / dot(q - c1, q - c1) + 0.5 * r * r / dot(q - c2, q - c2) + 0.4 * r * r / dot(q - c3, q - c3);
 }
 float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 
 void main(){
   float ar = res.x / res.y;
+  vec2 uv = v;
   vec2 q = (v - 0.5) * vec2(ar, 1.0);
-  float f = field(q);
-  vec2 e = vec2(0.002, 0.0);
-  vec2 g = vec2(field(q + e.xy) - field(q - e.xy), field(q + e.yx) - field(q - e.yx)) / (2.0 * e.x);
-  float inside = smoothstep(0.95, 1.12, f);
-  float edge = 1.0 - smoothstep(1.0, 2.6, f);            // 1 at the rim, 0 deep inside
-  vec2 n = normalize(g + 1e-5);
+  float r = length(q);
 
-  // refraction: magnify toward the lens centre, bend hard at the rim
-  vec2 off = -n * (0.018 + 0.06 * edge) * inside;
-  vec2 uv = cover(v);
-  vec2 lc = mouse / vec2(ar, 1.0) + 0.5;                 // lens centre in screen uv
-  vec2 uvL = cover(lc + (v - lc) * 0.74 + off * 0.5);    // magnified around the lens
-  float ca = 0.004 + 0.014 * edge;
-  vec3 lens = vec3(
-    texture2D(tex, uvL + n * ca).r,
-    texture2D(tex, uvL).g,
-    texture2D(tex, uvL - n * ca).b);
-  lens = grade(lens) * 1.12;
+  // extreme magnification around a drifting focus
+  vec2 focus = vec2(0.5 + 0.06 * sin(time * 0.9), 0.55 + 0.05 * cos(time * 0.7));
+  uv = mix(uv, focus + (uv - focus) * 0.2, mag);
 
-  vec3 base = grade(texture2D(tex, uv).rgb);
-  float vign = smoothstep(1.25, 0.25, length((v - 0.5) * vec2(ar * 0.9, 1.0)));
-  base *= mix(0.42, 1.0, vign) * smoothstep(0.25, 1.0, reveal);
+  // swirl twist that unwinds
+  float ang = swirl * pow(max(0.0, 1.0 - r / 0.85), 2.0);
+  vec2 d = uv - 0.5; float cs = cos(ang), sn = sin(ang);
+  uv = 0.5 + vec2(cs * d.x - sn * d.y, sn * d.x + cs * d.y);
 
-  // glass highlights
-  float rim = smoothstep(0.55, 1.0, edge) * inside;
-  float spec = pow(max(dot(n, normalize(vec2(-0.6, 0.8))), 0.0), 6.0) * edge * inside;
-  vec3 col = mix(base, lens, inside);
-  col += vec3(1.0, 0.55, 0.22) * rim * 0.16 + vec3(1.0, 0.92, 0.82) * spec * 0.4;
-  col += vec3(0.9, 0.3, 0.08) * (1.0 - inside) * smoothstep(0.6, 0.95, f) * 0.12; // glow halo
-  col += (hash(v * res + time) - 0.5) * 0.055;                                      // grain
+  // fisheye bubble
+  vec2 fd = uv - 0.5; float fr = length(fd * vec2(ar, 1.0));
+  uv = mix(uv, 0.5 + fd * (0.5 + 0.9 * fr * fr), fish);
+
+  vec3 col = grade(samp(uv));
+
+  // chrome droplet in the middle of the frame
+  if (drop > 0.01) {
+    float R = 0.27 * drop + 0.035 * sin(time * 3.0) * drop;
+    float f = field(q, R);
+    float inside = smoothstep(0.95, 1.08, f);
+    vec2 e = vec2(0.002, 0.0);
+    vec2 g = vec2(field(q + e.xy, R) - field(q - e.xy, R), field(q + e.yx, R) - field(q - e.yx, R));
+    vec2 n = normalize(g + 1e-5);
+    float edge = 1.0 - smoothstep(1.0, 2.2, f);
+    vec2 refr = 0.5 - (v - 0.5) * 0.8 + n * 0.12 * edge;           // a glass ball flips the scene
+    vec2 refl = 0.5 + n * (0.18 + 0.35 * edge) + (v - 0.5) * 0.3;
+    vec3 a = grade(texture2D(tex, cover(refr)).rgb);
+    vec3 b = grade(texture2D(tex, cover(refl)).rgb);
+    float lb = dot(b, vec3(0.33));
+    vec3 chrome = mix(a * 1.15, vec3(lb) * vec3(1.2, 1.0, 0.9), 0.55 * edge);
+    chrome += vec3(1.0, 0.92, 0.84) * pow(edge, 6.0) * 0.75;         // bright chrome rim
+    chrome *= 1.0 - 0.45 * smoothstep(0.35, 0.6, edge) * (1.0 - smoothstep(0.6, 0.85, edge)); // dark band
+    col = mix(col, chrome, inside);
+  }
+
+  // the opening: dark liquid swirling out of black
+  if (dark > 0.01) {
+    float f = field(q * 0.6, 0.30);
+    float rim = smoothstep(0.7, 1.0, f) * (1.0 - smoothstep(1.0, 1.9, f));
+    vec3 liquid = vec3(0.02, 0.006, 0.004) + vec3(0.95, 0.42, 0.16) * rim * 0.55 + col * 0.12 * smoothstep(1.0, 2.5, f);
+    col = mix(col, liquid, dark);
+  }
+
+  col *= 1.0 - fish * 0.85 * smoothstep(0.42, 0.78, fr);                // bubble edges fall to black
+  float vig = smoothstep(1.25, 0.3, length((v - 0.5) * vec2(ar * 0.85, 1.0)));
+  col *= mix(0.5, 1.0, vig);
+  col += flash * 0.35;
+  col += (hash(v * res + time) - 0.5) * 0.06;                          // grain
   gl_FragColor = vec4(col, 1.0);
 }`;
 
-export function initHero(host) {
+export function initHero(host, { onOpeningDone, onBeat } = {}) {
   const canvas = host.querySelector("canvas");
-  const videos = CLIPS.map((src) => {
-    const vd = document.createElement("video");
-    Object.assign(vd, { src, muted: true, playsInline: true, preload: "auto", crossOrigin: "anonymous" });
-    vd.setAttribute("muted", ""); vd.setAttribute("playsinline", "");
-    return vd;
-  });
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let active = 0, pulse = 0, revealStart = 0, started = false, visible = true;
-
-  const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
+  const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false, powerPreference: "high-performance" });
   if (!gl) return fallback();
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+  const compile = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
   let prog;
   try {
     prog = gl.createProgram();
-    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT)); gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
     gl.linkProgram(prog);
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
   } catch (err) { console.warn("[RUMOAR] hero shader failed, using fallback", err); return fallback(); }
@@ -107,82 +141,105 @@ export function initHero(host) {
   const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
   const loc = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const U = (n) => gl.getUniformLocation(prog, n);
-  const u = { res: U("res"), texRes: U("texRes"), mouse: U("mouse"), time: U("time"), reveal: U("reveal"), pulse: U("pulse") };
+  const U = {}; ["res", "texRes", "time", "kb", "dark", "mag", "zoom", "drop", "swirl", "fish", "lift", "flash"].forEach((n) => (U[n] = gl.getUniformLocation(prog, n)));
 
   const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([20, 6, 4, 255]));
+  [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(([k, val]) => gl.texParameteri(gl.TEXTURE_2D, k, val));
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([11, 3, 2, 255]));
 
-  // lens follows the pointer lazily; wanders on its own on touch screens
-  const target = { x: 0, y: 0 }, lens = { x: 0, y: 0 };
-  let pointerSeen = false;
-  addEventListener("pointermove", (e) => {
-    if (e.pointerType === "touch") return;
-    const r = canvas.getBoundingClientRect();
-    target.x = ((e.clientX - r.left) / r.width - 0.5) * (r.width / r.height);
-    target.y = (0.5 - (e.clientY - r.top) / r.height);
-    pointerSeen = true;
-  }, { passive: true });
+  // preload every source once
+  const media = new Map();
+  const load = (item) => {
+    if (media.has(item.src)) return media.get(item.src);
+    let el;
+    if (item.kind === "video") {
+      el = Object.assign(document.createElement("video"), { src: item.src, muted: true, playsInline: true, loop: true, preload: "auto" });
+      el.setAttribute("muted", ""); el.setAttribute("playsinline", "");
+    } else { el = new Image(); el.decoding = "async"; el.src = item.src; }
+    media.set(item.src, el); return el;
+  };
+  [...OPENING, ...REEL].forEach(load);
+
+  let seq = [], idx = -1, segStart = 0, current = null, started = false, visible = true, inOpening = true, imageUploaded = false;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+  function next(now) {
+    if (current?.el?.pause) current.el.pause();
+    idx++;
+    if (inOpening && idx >= OPENING.length) { inOpening = false; idx = 0; onOpeningDone?.(); }
+    const list = inOpening ? OPENING : REEL;
+    const item = list[idx % list.length];
+    const el = load(item);
+    current = { ...item, el, ms: item.ms || (item.kind === "video" ? 3600 : 2800), fx: item.fx || { zoom: [0.55, 0], fish: [0.25, 0] } };
+    if (el.tagName === "VIDEO") { try { el.currentTime = 0; } catch {} el.play().catch(() => {}); }
+    imageUploaded = false;
+    segStart = now;
+    onBeat?.(inOpening ? idx : -1);
+  }
+
+  function upload() {
+    const el = current.el;
+    if (el.tagName === "VIDEO") {
+      if (el.readyState < 2) return;
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el);
+      gl.uniform2f(U.texRes, el.videoWidth || 960, el.videoHeight || 540);
+    } else if (!imageUploaded && el.complete && el.naturalWidth) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el);
+      gl.uniform2f(U.texRes, el.naturalWidth, el.naturalHeight);
+      imageUploaded = true;
+    }
+  }
 
   function resize() {
-    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(devicePixelRatio || 1, innerWidth < 700 ? 1.25 : 1.5);
     canvas.width = Math.round(canvas.clientWidth * dpr); canvas.height = Math.round(canvas.clientHeight * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);
   }
   addEventListener("resize", resize); resize();
 
-  videos.forEach((vd, i) => vd.addEventListener("ended", () => {
-    if (i !== active) return;
-    active = 1 - active; pulse = 1;
-    const nx = videos[active]; nx.currentTime = 0; nx.play().catch(() => {});
-  }));
-
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
-    const vd = videos[active];
-    if (!started) return;
-    visible ? vd.play().catch(() => {}) : vd.pause();
+    if (!started || !current) return;
+    if (current.el.tagName === "VIDEO") visible ? current.el.play().catch(() => {}) : current.el.pause();
   }, { threshold: 0.01 }).observe(host);
 
   function frame(now) {
     requestAnimationFrame(frame);
-    if (!visible || !started) return;
-    const t = now / 1000;
-    const reveal = reduce ? 1 : Math.min(1, (now - revealStart) / 2600);
-    if (!pointerSeen) { target.x = 0.22 * Math.sin(t * 0.33); target.y = 0.12 * Math.cos(t * 0.27); }
-    lens.x += (target.x - lens.x) * 0.06; lens.y += (target.y - lens.y) * 0.06;
-    pulse *= 0.93;
-    const vd = videos[active];
-    if (vd.readyState >= 2) {
-      gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, vd);
-      gl.uniform2f(u.texRes, vd.videoWidth || 960, vd.videoHeight || 540);
-    }
-    gl.uniform2f(u.res, canvas.width, canvas.height);
-    gl.uniform2f(u.mouse, lens.x, lens.y);
-    gl.uniform1f(u.time, t);
-    gl.uniform1f(u.reveal, reveal);
-    gl.uniform1f(u.pulse, pulse);
+    if (!started || !visible) return;
+    if (!current || now - segStart >= current.ms) next(now);
+    const t = Math.min(1, (now - segStart) / current.ms);
+    const fx = current.fx;
+    const env = (k, def = 0) => (fx[k] ? lerp(fx[k][0], fx[k][1], ease(t)) : def);
+    upload();
+    gl.uniform2f(U.res, canvas.width, canvas.height);
+    gl.uniform1f(U.time, now / 1000);
+    gl.uniform1f(U.kb, current.kind === "image" ? 1 + 0.07 * t : 1);
+    gl.uniform1f(U.dark, env("dark") * (1 - Math.max(0, t - 0.75) * 4));
+    gl.uniform1f(U.mag, env("mag"));
+    gl.uniform1f(U.zoom, env("zoom"));
+    gl.uniform1f(U.drop, fx.drop ? env("drop") * Math.min(1, t * 5) : 0);
+    gl.uniform1f(U.swirl, env("swirl"));
+    gl.uniform1f(U.fish, env("fish"));
+    gl.uniform1f(U.lift, env("lift"));
+    gl.uniform1f(U.flash, Math.max(0, 1 - (now - segStart) / 120) * (inOpening ? 0.6 : 0.3));
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
   requestAnimationFrame(frame);
 
   function fallback() {
     host.classList.add("is-fallback");
-    const vd = videos[0]; vd.loop = true; vd.className = "stage__fallback";
-    host.appendChild(vd);
-    return { start() { vd.play().catch(() => {}); } };
+    const vd = Object.assign(document.createElement("video"), { src: pickVideo("assets/video/street-a.mp4"), muted: true, loop: true, playsInline: true, className: "hero__fallback" });
+    vd.setAttribute("muted", ""); vd.setAttribute("playsinline", "");
+    host.querySelector(".hero__film").appendChild(vd);
+    return { start() { vd.play().catch(() => {}); setTimeout(() => onOpeningDone?.(), 600); } };
   }
 
   return {
     start() {
       if (started) return;
-      started = true; revealStart = performance.now();
-      videos[active].play().catch(() => {});
+      started = true;
+      if (reduce) { inOpening = false; idx = -1; onOpeningDone?.(); }
       host.classList.add("is-on");
     },
   };

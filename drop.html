@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Drop 01 · RUMOAR</title>
+  <meta name="description" content="RUMOAR Drop 01: fifteen bags, each a character. Wishlist yours and hear first at launch." />
+  <meta name="theme-color" content="#f2efe9" />
+  <meta property="og:title" content="Drop 01 · RUMOAR" />
+  <meta property="og:image" content="assets/og.jpg" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body data-page="drop">
+  <main class="drop">
+    <header class="drop__head">
+      <div class="bar"><span>(Drop 01)</span><span data-clock>IST</span></div>
+      <div>
+        <h1 class="head">Drop 01</h1>
+        <p class="muted">Fifteen bags, each one a character. Wishlist yours and hear first when it opens.</p>
+      </div>
+      <div class="filters" role="tablist" aria-label="Filter the drop" id="filters"></div>
+    </header>
+
+    <div class="drop__wrap is-locked" id="dropWrap">
+      <ul class="cards" id="cards" aria-live="polite"></ul>
+      <div class="gate">
+        <div class="gate__card">
+          <span class="label">Members only</span>
+          <h2 class="head">Before you enter.</h2>
+          <p class="muted">Drop 01 opens to the list first. Tell us who you are and it’s yours to explore and wishlist.</p>
+          <button class="btn btn--flame" type="button" data-open-signup>Sign up to enter <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot" data-dark>
+    <div class="foot__row">
+      <span>Designing a world, not just a product</span>
+      <nav aria-label="Footer"><a href="./">Home</a><a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a></nav>
+    </div>
+    <div class="foot__mark" aria-hidden="true">RUMOAR</div>
+    <div class="foot__row"><span>© 2026 RUMOAR</span><span>Designed in India</span></div>
+  </footer>
+
+  <script type="module" src="js/drop.js"></script>
+</body>
+</html>
