@@ -1,6 +1,8 @@
 import { PRODUCTS, CATEGORIES, byId, formatINR } from "./products.js";
 import { createStore } from "./store.js";
 import { initRings, PERSONAS } from "./rings.js";
+import { runIntro } from "./intro.js";
+import { initHero, pickVideo } from "./hero-gl.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -118,43 +120,37 @@ document.addEventListener("click", (e) => { if (e.target.closest("[data-open-sig
   tick(); setInterval(tick, 1000);
 })();
 
-/* ───────── hero: bag on stage + flap board, cycling ───────── */
+/* ───────── 01 stage: liquid-lens film, shrinks into a card on scroll ───────── */
+const stageEl = $("#stage");
+const hero = initHero(stageEl);
 (() => {
-  const ORDER = ["vanguard", "drifter", "chameleon", "maverick", "provocateur", "diplomat", "operator"];
-  const flap = new Flap($("#heroFlap"), 15);
-  const imgs = $$(".hero__bag");
-  const tag = $("#heroTag"), spec = $(".hero__spec");
-  let i = 0, front = 0, timer;
-  ORDER.forEach((id) => { const im = new Image(); im.src = `assets/hero/${id}.webp`; }); // warm the cache
-
-  function paint(id, instant) {
-    const p = byId[id];
-    flap.set(p.name);
-    const n = PRODUCTS.indexOf(p) + 1;
-    const write = () => {
-      tag.textContent = p.tagline;
-      $("#heroIdx").textContent = `${String(n).padStart(2, "0")} / ${PRODUCTS.length}`;
-      $("#heroType").textContent = p.type;
-      $("#heroPrice").textContent = formatINR(p.price);
-      tag.classList.remove("is-out"); spec.classList.remove("is-out");
-    };
-    if (instant) return write();
-    tag.classList.add("is-out"); spec.classList.add("is-out");
-    setTimeout(write, 420);
+  const frame = $("#stageFrame");
+  const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  let ticking = false;
+  function update() {
+    ticking = false;
+    const vw = innerWidth, vh = stageEl.querySelector(".stage__pin").clientHeight;
+    const total = stageEl.offsetHeight - vh;
+    const raw = Math.min(1, Math.max(0, -stageEl.getBoundingClientRect().top / Math.max(1, total)));
+    const e = ease(Math.min(1, Math.max(0, (raw - 0.08) / 0.62)));
+    const phone = vw < 700;
+    const cw = Math.min(phone ? vw * 0.74 : vw * 0.42, 760);
+    const hc = Math.min(cw * (phone ? 1.05 : 0.56), vh * 0.44);
+    const cy = vh * (phone ? 0.0 : 0.07);
+    const s = cw / vw;
+    const inset = Math.max(0, (vh - hc / s) / 2);
+    const scale = 1 - (1 - s) * e;
+    frame.style.transform = `translateY(${cy * e}px) scale(${scale})`;
+    frame.style.clipPath = `inset(${inset * e}px 0px ${inset * e}px 0px round ${(14 / scale) * e}px)`;
+    stageEl.style.setProperty("--p", e.toFixed(4));
+    stageEl.style.setProperty("--cw", `${cw}px`);
+    stageEl.style.setProperty("--hc", `${hc}px`);
+    stageEl.style.setProperty("--cy", `${cy}px`);
+    stageEl.classList.toggle("is-settled", e > 0.85);
   }
-  function next() {
-    i = (i + 1) % ORDER.length;
-    const id = ORDER[i], back = imgs[1 - front];
-    back.src = `assets/hero/${id}.webp`;
-    const swap = () => { back.classList.add("is-on"); imgs[front].classList.remove("is-on"); front = 1 - front; };
-    (back.decode ? back.decode() : Promise.resolve()).then(swap, swap);
-    paint(id);
-  }
-  paint(ORDER[0], true);
-  const start = () => { if (!reduceMotion && !timer) timer = setInterval(next, 4200); };
-  const stop = () => { clearInterval(timer); timer = null; };
-  new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop())).observe($(".hero"));
-  $("#heroStage").addEventListener("click", () => openProduct(ORDER[i]));
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener("resize", update);
+  update();
 })();
 
 /* ───────── who are you today: personality rings ───────── */
@@ -195,16 +191,15 @@ document.addEventListener("click", (e) => { if (e.target.closest("[data-open-sig
   update();
 })();
 
-/* ───────── ethos: rule images keep turning front/side ───────── */
+/* ───────── ethos: rule images keep cycling ───────── */
 (() => {
   $$(".rule__img").forEach((fig, k) => {
-    const p = byId[fig.dataset.cycle];
-    if (!p) return;
-    fig.innerHTML = p.images.map((src, j) => `<img src="${src}" alt="" loading="lazy" class="${j === 0 ? "is-on" : ""}" />`).join("");
+    const list = fig.dataset.cycle.split("|");
+    fig.innerHTML = list.map((src, j) => `<img src="${src}" alt="" loading="lazy" class="${j === 0 ? "is-on" : ""}" />`).join("");
     if (reduceMotion) return;
     const ims = $$("img", fig);
     let on = 0;
-    setTimeout(() => setInterval(() => { ims[on].classList.remove("is-on"); on = 1 - on; ims[on].classList.add("is-on"); }, 3000), k * 900);
+    setTimeout(() => setInterval(() => { ims[on].classList.remove("is-on"); on = (on + 1) % ims.length; ims[on].classList.add("is-on"); }, 3000), k * 900);
   });
 })();
 
@@ -227,11 +222,65 @@ document.addEventListener("click", (e) => { if (e.target.closest("[data-open-sig
   els.forEach((el) => io.observe(el));
 })();
 
-/* ───────── marquee ───────── */
+/* ───────── 03 on air: the TV wall, every screen keeps changing ───────── */
 (() => {
-  const names = PRODUCTS.map((p) => p.name.toUpperCase());
-  const run = names.map((n) => `${esc(n)}<i>●</i>`).join("");
-  $("#marquee").innerHTML = `<span>${run}</span><span>${run}</span>`;
+  const sets = $$("#tvWall .set");
+  const productImgs = PRODUCTS.map((p) => p.images[0]);
+  const live = [];
+  sets.forEach((set) => {
+    const screen = document.createElement("div");
+    screen.className = "screen";
+    set.appendChild(screen);
+    const [kind, arg = ""] = set.dataset.ch.split(/:(.*)/s);
+    const chyron = (txt) => { const c = document.createElement("span"); c.className = "chyron"; c.textContent = txt; screen.appendChild(c); return c; };
+    let next = () => {};
+
+    if (kind === "video") {
+      const vd = Object.assign(document.createElement("video"), { src: pickVideo(arg), muted: true, loop: true, playsInline: true, preload: "metadata" });
+      vd.setAttribute("muted", ""); vd.setAttribute("playsinline", "");
+      screen.appendChild(vd); chyron("Live");
+      live.push({ el: set, on: () => vd.play().catch(() => {}), off: () => vd.pause() });
+      next = () => { vd.currentTime = (vd.currentTime + 1.7) % (vd.duration || 5); };
+    } else if (kind === "word") {
+      const w = document.createElement("div"); w.className = "word"; w.textContent = "RUMOAR"; screen.appendChild(w);
+      const words = ["RUMOAR", "WHO ARE YOU?", "DROP 01", "RUMOAR", "NOISE OFF", "FOCUS ON"];
+      let k = 0; next = () => { k = (k + 1) % words.length; w.textContent = words[k]; };
+      setInterval(() => !reduceMotion && zap(screen, next), 3800);
+    } else if (kind === "static") {
+      const c = document.createElement("canvas"); c.width = 160; c.height = 120; screen.appendChild(c);
+      const g = c.getContext("2d"), img = g.createImageData(160, 120);
+      const clock = chyron("No signal");
+      let on = false;
+      const draw = () => {
+        if (!on) return;
+        for (let i = 0; i < img.data.length; i += 4) { const v = Math.random() * 200; img.data[i] = v; img.data[i + 1] = v * 0.55; img.data[i + 2] = v * 0.4; img.data[i + 3] = 255; }
+        g.putImageData(img, 0, 0); requestAnimationFrame(draw);
+      };
+      const fmt = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+      setInterval(() => { clock.textContent = `On air · IST ${fmt.format(new Date())}`; }, 1000);
+      live.push({ el: set, on: () => { if (!on && !reduceMotion) { on = true; draw(); } }, off: () => { on = false; } });
+    } else {
+      const list = kind === "products" ? productImgs : arg.split("|");
+      const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = list[0]; screen.appendChild(im);
+      const tag = chyron(kind === "products" ? PRODUCTS[0].name : "Ch. 01");
+      let k = 0;
+      next = () => {
+        k = (k + 1) % list.length; im.src = list[k];
+        tag.textContent = kind === "products" ? PRODUCTS[k].name : `Ch. ${String(k + 1).padStart(2, "0")}`;
+      };
+      setInterval(() => !reduceMotion && zap(screen, next), kind === "products" ? 1900 : 3100 + Math.random() * 1200);
+    }
+    set.addEventListener("click", () => zap(screen, next));
+  });
+  function zap(screen, fn) {
+    screen.classList.add("is-zap");
+    setTimeout(() => { fn(); screen.classList.remove("is-zap"); }, 140);
+  }
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    const l = live.find((x) => x.el === e.target);
+    if (l) (e.isIntersecting ? l.on() : l.off());
+  }), { threshold: 0.1 });
+  live.forEach((l) => io.observe(l.el));
 })();
 
 /* ───────── collection ───────── */
@@ -246,33 +295,56 @@ $("#filters").addEventListener("click", (e) => {
   if (!b) return;
   state.filter = b.dataset.filter;
   $$(".chip").forEach((c) => c.setAttribute("aria-selected", c === b));
-  $$(".card").forEach((c) => c.classList.toggle("is-hidden", state.filter !== "all" && c.dataset.cat !== state.filter));
+  $$(".row").forEach((c) => c.classList.toggle("is-hidden", state.filter !== "all" && c.dataset.cat !== state.filter));
+  const n = $$(".row:not(.is-hidden)").length;
+  $("#colCount").textContent = `${n} object${n === 1 ? "" : "s"}`;
 });
 
 function renderGrid() {
   $("#grid").innerHTML = PRODUCTS.map((p, i) => `
-    <li class="card" data-id="${p.id}" data-cat="${p.category}">
-      <button class="card__heart" type="button" aria-pressed="${state.wish.has(p.id)}" aria-label="Wishlist ${esc(p.name)}">${HEART}</button>
-      <button class="card__open" type="button" aria-label="View ${esc(p.name)}">
-        <div class="card__media">
-          <img src="${p.images[0]}" alt="${esc(p.name)}, front" loading="lazy" width="1000" height="1139" />
-          <img src="${p.images[1]}" alt="" loading="lazy" width="1000" height="1139" />
-          <span class="card__num">(${String(i + 1).padStart(2, "0")})</span>
-        </div>
-        <div class="card__body">
-          <span class="card__name">${esc(p.name)}</span>
-          <span class="card__meta">${esc(p.type)} · ${esc(p.colour)}</span>
-          <span class="card__price">${formatINR(p.price)}</span>
-        </div>
+    <li class="row" data-id="${p.id}" data-cat="${p.category}">
+      <button class="row__open" type="button" aria-label="View ${esc(p.name)}">
+        <span class="row__n">${String(i + 1).padStart(2, "0")}</span>
+        <span class="row__thumb"><img src="${p.images[0]}" alt="" loading="lazy" width="1000" height="1139" /></span>
+        <span class="row__name">${esc(p.name)}</span>
+        <span class="row__meta">${esc(p.type)} · ${esc(p.colour)}</span>
+        <span class="row__price">${formatINR(p.price)}</span>
       </button>
+      <button class="row__heart" type="button" aria-pressed="${state.wish.has(p.id)}" aria-label="Wishlist ${esc(p.name)}">${HEART}</button>
     </li>`).join("");
 }
 $("#grid").addEventListener("click", (e) => {
-  const card = e.target.closest(".card");
-  if (!card) return;
-  if (e.target.closest(".card__heart")) toggleWish(card.dataset.id);
-  else openProduct(card.dataset.id);
+  const row = e.target.closest(".row");
+  if (!row) return;
+  if (e.target.closest(".row__heart")) toggleWish(row.dataset.id);
+  else openProduct(row.dataset.id);
 });
+
+// floating preview that follows the cursor over the index (desktop)
+(() => {
+  const pv = $("#preview"), [a, b] = $$("img", pv);
+  if (!matchMedia("(hover: hover)").matches) return;
+  let x = 0, y = 0, px = 0, py = 0, on = false, current = null, sideTimer;
+  const loop = () => {
+    px += (x - px) * 0.16; py += (y - py) * 0.16;
+    pv.style.transform = `translate(${px - 120}px, ${py - 137}px) scale(${on ? 1 : 0.85}) rotate(${(x - px) * 0.04}deg)`;
+    if (on || Math.abs(x - px) > 0.5) requestAnimationFrame(loop);
+  };
+  $("#grid").addEventListener("pointermove", (e) => {
+    x = e.clientX + 150; y = e.clientY;
+    const row = e.target.closest(".row");
+    if (!row || $("#collection").classList.contains("is-locked")) return hide();
+    if (row.dataset.id !== current) {
+      const p = byId[row.dataset.id];
+      current = p.id; a.src = p.images[0]; b.src = p.images[1];
+      pv.classList.remove("is-side"); clearTimeout(sideTimer);
+      sideTimer = setTimeout(() => pv.classList.add("is-side"), 900);
+    }
+    if (!on) { on = true; px = x; py = y; pv.classList.add("is-on"); requestAnimationFrame(loop); }
+  });
+  const hide = () => { on = false; current = null; pv.classList.remove("is-on"); clearTimeout(sideTimer); };
+  $("#grid").addEventListener("pointerleave", hide);
+})();
 
 /* ───────── wishlist ───────── */
 let saveChain = Promise.resolve();
@@ -291,7 +363,7 @@ function toggleWish(id, force) {
   });
 }
 function syncWishUI(id) {
-  $$(`.card[data-id="${id}"] .card__heart`).forEach((b) => b.setAttribute("aria-pressed", state.wish.has(id)));
+  $$(`.row[data-id="${id}"] .row__heart`).forEach((b) => b.setAttribute("aria-pressed", state.wish.has(id)));
   if (currentProduct === id) renderWishButton(id);
   renderCount();
   if (!$("#drawer").hidden) renderDrawer();
@@ -506,5 +578,6 @@ renderGrid();
 renderMember();
 renderCount();
 if (store.mode === "demo") $("#demoPill").hidden = false;
+runIntro(() => hero.start());
 const deep = location.hash.match(/^#p\/([\w-]+)/);
 if (deep && byId[deep[1]]) openProduct(deep[1]);
