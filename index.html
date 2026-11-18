@@ -27,24 +27,24 @@
   <a class="skip" href="#onair">Skip to content</a>
 
   <div class="intro" id="intro" aria-hidden="true">
-    <canvas></canvas>
-    <div class="intro__ui"><span>RUMOAR</span><span>(Drop 01)</span><span>Who are you today?</span><span>Tap to skip</span></div>
+    <div class="intro__ui"><span>RUMOAR</span><span>Drop 01 · 2026</span><span>Who are you today?</span><span>Tap to skip</span></div>
+    <canvas class="intro__blocks"></canvas>
+    <div class="intro__title"><span>R</span><span>U</span><span>M</span><span>O</span><span>A</span><span>R</span></div>
   </div>
 
   <main>
     <section class="hero" id="hero" data-dark aria-label="RUMOAR">
       <div class="hero__film"><canvas aria-hidden="true"></canvas></div>
       <div class="hero__ui" aria-hidden="true">
-        <span>RUMOAR showcase <i>••</i></span>
-        <span class="hero__tc">Who are you today?</span>
-        <span class="hero__tr"><i>••</i> 2026 · Drop 01</span>
         <span class="hero__bl">Scroll ↓</span>
         <span class="hero__br" data-clock>IST</span>
       </div>
       <div class="hero__badge flap" id="heroBadge" aria-hidden="true"></div>
       <div class="hero__end">
-        <h1 class="hero__mark">RUMOAR</h1>
-        <a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a>
+        <h1 class="wm" id="wm" aria-label="RUMOAR">
+          <span class="wm__l" data-clip="l1"><span class="wm__g">R</span></span><span class="wm__l" data-clip="l2"><span class="wm__g">U</span></span><span class="wm__l" data-clip="l3"><span class="wm__g">M</span></span><span class="wm__l" data-clip="l4"><span class="wm__g">O</span></span><span class="wm__l" data-clip="l5"><span class="wm__g">A</span></span><span class="wm__l" data-clip="l6"><span class="wm__g">R</span></span>
+        </h1>
+        <div class="hero__cta"><span class="wm__hint">Hover a letter</span><a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a></div>
       </div>
     </section>
 
@@ -62,11 +62,16 @@
       </div>
     </section>
 
-    <section class="mood" id="mood" data-dark>
-      <div class="bar bar--dark"><span>The mood</span><span>Drop 01</span></div>
-      <h2 class="head rv">Own the look.</h2>
-      <div class="strip" data-strip="05,06,07,08,09,10,11,12,13,14,00"></div>
-      <div class="strip strip--rev" data-strip="16,17,18,19,20,21,22,23,24,25,26,27,28,29,30"></div>
+    <section class="look" id="look" data-dark>
+      <div class="look__pin">
+        <div class="look__field" id="lookField"></div>
+        <div class="look__title">
+          <span class="label">The mood · <span id="lookCount">01</span> / 26</span>
+          <h2 class="head">Own the look.</h2>
+          <a class="btn btn--cream look__cta" href="drop.html">Find yours <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="look__bar"><i id="lookBar"></i></div>
+      </div>
     </section>
 
     <section class="closer" data-dark>

@@ -21,13 +21,15 @@ export const onMember = (fn) => memberListeners.push(fn);
 const page = document.body.dataset.page || "home";
 document.body.insertAdjacentHTML("afterbegin", `
   <header class="nav" id="nav">
-    <a class="nav__logo" href="./" aria-label="RUMOAR home">RUMOAR</a>
     <nav class="nav__links" aria-label="Main">
       <a href="./"${page === "home" ? ' aria-current="page"' : ""}>Home</a>
       <a href="drop.html"${page === "drop" ? ' aria-current="page"' : ""}>Drop 01</a>
       <a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a>
     </nav>
+    <a class="nav__logo" href="./" aria-label="RUMOAR home">RUMOAR</a>
     <div class="nav__actions">
+      <a class="nav__drop" href="drop.html"${page === "drop" ? ' aria-current="page"' : ""}>Drop 01</a>
+      <button class="nav__sound" id="navSound" type="button" aria-pressed="false" aria-label="Sound on" title="Sound"><i></i><i></i><i></i><i></i></button>
       <button class="nav__member" id="navMember" type="button">Join</button>
       <button class="nav__wish" id="navWish" type="button" aria-label="Open wishlist">${HEART}<span class="nav__count" id="wishCount">0</span></button>
     </div>
@@ -376,6 +378,45 @@ export function armReveals() {
   els.forEach((el) => { el.classList.add("armed"); io.observe(el); });
   setTimeout(() => els.forEach((el) => el.classList.add("in")), 4000);
 }
+
+/* ───────── soundtrack: starts on the first tap / key, small toggle in the nav ───────── */
+(() => {
+  const btn = $("#navSound");
+  const audio = Object.assign(new Audio("assets/audio/soundtrack.mp3"), { loop: true, preload: "auto", volume: 0 });
+  let wantOn = true;
+  try { wantOn = localStorage.getItem("rumoar.sound") !== "off"; } catch {}
+  try { const t = Number(sessionStorage.getItem("rumoar.sound.t")); if (t) audio.currentTime = t; } catch {}
+  let fade;
+  const ramp = (to, ms, done) => {
+    clearInterval(fade);
+    const from = audio.volume, t0 = performance.now();
+    fade = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / ms);
+      audio.volume = from + (to - from) * k;
+      if (k >= 1) { clearInterval(fade); done?.(); }
+    }, 30);
+  };
+  const ui = (on) => { btn.setAttribute("aria-pressed", on); btn.setAttribute("aria-label", on ? "Sound off" : "Sound on"); btn.classList.toggle("is-on", on); };
+  const start = () => audio.play().then(() => { ui(true); ramp(0.55, 1600); return true; }).catch(() => false);
+  const stop = () => { ui(false); ramp(0, 400, () => audio.pause()); };
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    wantOn = audio.paused;
+    try { localStorage.setItem("rumoar.sound", wantOn ? "on" : "off"); } catch {}
+    wantOn ? start() : stop();
+  });
+  ui(false);
+  if (wantOn) {
+    start().then((ok) => {
+      if (ok) return;
+      // browsers only allow sound after the visitor interacts once
+      const kick = (e) => { if (e.target.closest?.("#navSound")) return; if (wantOn && audio.paused) start(); ["pointerdown", "keydown", "touchend"].forEach((t) => removeEventListener(t, kick, true)); };
+      ["pointerdown", "keydown", "touchend"].forEach((t) => addEventListener(t, kick, true));
+    });
+  }
+  addEventListener("pagehide", () => { try { sessionStorage.setItem("rumoar.sound.t", String(audio.currentTime)); } catch {} });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn && btn.classList.contains("is-on")) audio.play().catch(() => {}); });
+})();
 
 /* ───────── boot ───────── */
 renderNavName();

@@ -26,6 +26,9 @@ js/hero-gl.js         the film reel (opening sequence + clips list at the top)
 js/store.js           saves sign-ups + wishlists (Firebase or demo mode)
 assets/collage/       moodboard photos used across the homepage (swap freely)
 assets/video/         the two street films (MP4 + WebM)
+assets/letters/       the six clips that play inside the RUMOAR letters
+assets/audio/         soundtrack.mp3 (instrumental loop; visitors can mute it from the nav)
+assets/intro/         the red portraits used in the intro
 assets/products/      30 product shots (front + side for 15 bags)
 ```
 
