@@ -1,10 +1,9 @@
 // RUMOAR wordmark.
 // Laptop: one giant line of deep pearl-white letters. Hover a letter and its
 // film wipes up inside the letterform (canvas mask).
-// Phone: the word stands up as a tall spine down the left of the screen, read
-// bottom to top. Your finger paints the films through the letters, and the
-// paint slowly heals back to pearl. When nobody is touching it, a ghost brush
-// keeps drifting through the spine, and the side panel names the letter it lights up.
+// Phone: a poster. The word runs across the top like a masthead; your finger
+// paints the films through the letters and the paint slowly heals back to
+// pearl. When nobody is touching it, a ghost brush keeps drifting through.
 
 import { pickVideo } from "./hero-gl.js";
 
@@ -61,26 +60,24 @@ export function initWordmark(host, { onLetter } = {}) {
     W = host.clientWidth; H = host.clientHeight;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     phone = W < 700;
-    host.classList.toggle("is-spine", phone);
+    host.classList.toggle("is-mast", phone);
     let mctx, mw, mh;
     if (!phone) {
       glyphs = layoutRows(["RUMOAR"], { x: 18, y: 96, w: W - 36, h: H - 96 - 104, pad: 18 }, ctx);
       mw = canvas.width; mh = canvas.height;
     } else {
-      // the spine: length runs up the screen, thickness across it
-      const top = 78, bottom = 122, side = 14;
-      const L = H - top - bottom;
+      // poster band across the top, like a magazine masthead
+      const side = 12, top = 70;
       const cap = measure(ctx);
       const w100 = LETTERS.split("").reduce((a, ch) => a + ctx.measureText(ch).width + TRACK, 0) - TRACK;
-      const thick = Math.min(W * 0.56, cap * (L / w100) * 2.1);
+      const L = W - side * 2;
+      const thick = Math.min(H * 0.26, cap * (L / w100) * 2.15);
       spine = { x: side, y: top, L, T: thick };
       V.width = Math.round(L * dpr); V.height = Math.round(thick * dpr);
       film.width = V.width; film.height = V.height;
       paint.width = Math.max(1, Math.round(L * PS)); paint.height = Math.max(1, Math.round(thick * PS));
       glyphs = layoutRows(["RUMOAR"], { x: 0, y: 0, w: L, h: thick }, vctx);
-      host.style.setProperty("--spine-x", `${side + thick}px`);
-      host.style.setProperty("--spine-top", `${top}px`);
-      host.style.setProperty("--spine-h", `${L}px`);
+      host.style.setProperty("--mast-h", `${top + thick}px`);
       mw = V.width; mh = V.height;
     }
     mask.width = mw; mask.height = mh;
@@ -137,7 +134,7 @@ export function initWordmark(host, { onLetter } = {}) {
   }
 
   /* ── phone: paint the films through the spine ── */
-  function toV(px, py) { return { u: spine.y + spine.L - py, v: px - spine.x }; }
+  function toV(px, py) { return { u: px - spine.x, v: py - spine.y }; }
   function glyphAtU(u) { const g = glyphs.find((g) => u >= g.x && u < g.x + g.sw); return g ? g.i : -1; }
   let prev = null;
   function brush(u, v, r, strength = 1) {
@@ -164,13 +161,13 @@ export function initWordmark(host, { onLetter } = {}) {
     const { L, T } = spine;
     // heal: the paint fades back towards pearl
     pctx.globalCompositeOperation = "destination-out";
-    pctx.fillStyle = "rgba(0,0,0,0.028)"; pctx.fillRect(0, 0, paint.width, paint.height);
+    pctx.fillStyle = "rgba(0,0,0,0.045)"; pctx.fillRect(0, 0, paint.width, paint.height);
     pctx.globalCompositeOperation = "source-over";
     // ghost brush when nobody is touching
     if (now - lastTouch > 2600) {
       const t = now / 1000;
-      const u = L * (0.5 + 0.46 * Math.sin(t * 0.42)), v = T * (0.5 + 0.32 * Math.sin(t * 1.7 + 1));
-      brush(u, v, T * 0.42, 0.55);
+      const u = L * (0.5 + 0.48 * Math.sin(t * 0.5)), v = T * (0.5 + 0.3 * Math.sin(t * 1.9 + 1));
+      brush(u, v, T * 0.34, 0.32);
     } else if (now - lastTouch > 300) prev = null;
 
     // play only the letters that are lit
@@ -200,13 +197,10 @@ export function initWordmark(host, { onLetter } = {}) {
     vctx.drawImage(mask, 0, 0);
     vctx.globalCompositeOperation = "source-over";
 
-    // stand the word up: it reads bottom to top
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.translate(spine.x, spine.y + L);
-    ctx.rotate(-Math.PI / 2);
-    ctx.drawImage(V, 0, 0, L, T);
+    ctx.drawImage(V, spine.x, spine.y, L, T);
   }
 
   /* ── input ── */

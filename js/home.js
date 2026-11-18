@@ -8,15 +8,77 @@ import { initWordmark } from "./wordmark.js";
 const heroEl = $("#hero");
 const badge = new Flap($("#heroBadge"), 1);
 const LETTERS = "RUMOAR";
-const sideName = new Flap($("#heroSideN"), 10);
-sideName.set("MAVERICK");
-const wordmark = initWordmark($("#heroWord"), {
-  onLetter: (i, name) => { sideName.set(name.replace(/^The /, "")); $("#heroSideI").textContent = `0${i + 1} / 06`; },
-});
+const wordmark = initWordmark($("#heroWord"));
 const hero = initHero(heroEl, {
   onBeat: (i) => { if (i >= 0) badge.set(LETTERS[i % LETTERS.length]); },
-  onOpeningDone: () => { heroEl.classList.add("is-open"); wordmark.start(); },
+  onOpeningDone: () => { heroEl.classList.add("is-open"); wordmark.start(); poster.start(); },
 });
+
+/* ───────── phone poster: a full-bleed face that keeps changing who it is ───────── */
+function initPoster(host) {
+  const FACES = [["f0", 0.5, 0.4, "Maverick"], ["f1", 0.45, 0.26, "Outlier"], ["f2", 0.5, 0.3, "Purist"], ["f3", 0.56, 0.26, "Operator"],
+    ["f4", 0.62, 0.36, "Drifter"], ["f5", 0.55, 0.4, "Nomad"], ["f6", 0.5, 0.22, "Strategist"]];
+  const canvas = host.querySelector("canvas"), ctx = canvas.getContext("2d");
+  const script = $("#heroScript"), idx = $("#heroIdx"), who = $("#heroWho");
+  const imgs = [];
+  let W, H, dpr, cur = 0, from = -1, swapAt = 0, shown = 0, running = false, visible = true;
+  const CELL = 34, SWAP = 900, HOLD = 4200;
+  const phone = () => innerWidth < 700;
+  function fit() { dpr = Math.min(devicePixelRatio || 1, 2); W = host.clientWidth; H = host.clientHeight; canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+  function map(f, zoom) {
+    const im = imgs[f]; if (!im) return null;
+    const iw = im.naturalWidth, ih = im.naturalHeight, s = Math.max(W / iw, H / ih) * zoom;
+    const cl = (v, a, b) => Math.min(b, Math.max(a, v));
+    // faces sit a little below the masthead
+    return { im, s, ox: cl(W / 2 - FACES[f][1] * iw * s, W - iw * s, 0), oy: cl(H * 0.52 - FACES[f][2] * ih * s, H - ih * s, 0) };
+  }
+  function draw(now) {
+    requestAnimationFrame(draw);
+    if (!visible || !phone()) return;
+    if (now - shown > HOLD && imgs[(cur + 1) % FACES.length]) { from = cur; cur = (cur + 1) % FACES.length; swapAt = now; shown = now; label(); }
+    const zoom = 1.04 + 0.05 * Math.min(1, (now - shown) / (HOLD + SWAP));
+    const a = map(cur, zoom), b = from >= 0 ? map(from, 1.09) : null;
+    if (!a) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const k = (now - swapAt) / SWAP;
+    if (!b || k >= 1) { from = -1; ctx.drawImage(a.im, -a.ox / a.s, -a.oy / a.s, W / a.s, H / a.s, 0, 0, W, H); return; }
+    // the new face arrives block by block, rippling down from the masthead
+    ctx.drawImage(b.im, -b.ox / b.s, -b.oy / b.s, W / b.s, H / b.s, 0, 0, W, H);
+    for (let y = 0; y < H; y += CELL) for (let x = 0; x < W; x += CELL) {
+      const order = (y / H) * 0.75 + (Math.abs(x - W / 2) / W) * 0.35 + ((x * 7 + y * 13) % 17) / 17 * 0.15;
+      const t = Math.min(1, Math.max(0, (k * 1.5 - order) / 0.35));
+      if (t <= 0) continue;
+      const e = 1 - Math.pow(1 - t, 3), sz = CELL * e, o = (CELL - sz) / 2;
+      ctx.drawImage(a.im, (x + o - a.ox) / a.s, (y + o - a.oy) / a.s, sz / a.s, sz / a.s, x + o, y + o, sz + 0.5, sz + 0.5);
+    }
+  }
+  function label() {
+    script.classList.add("is-out");
+    setTimeout(() => {
+      script.textContent = FACES[cur][3]; who.textContent = `The ${FACES[cur][3]}`; idx.textContent = String(cur + 1).padStart(2, "0");
+      script.classList.remove("is-out");
+    }, 380);
+  }
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.01 }).observe(host);
+  addEventListener("resize", fit);
+  // tap the face to change who you are
+  host.parentElement.addEventListener("click", (e) => {
+    if (!phone() || e.target.closest("a, button") || now() - swapAt < SWAP) return;
+    if (e.clientY < (host.getBoundingClientRect().top + 70 + innerWidth * 0.4)) return; // taps on the word paint, not swap
+    shown = -1e9;
+  });
+  const now = () => performance.now();
+  return {
+    start() {
+      if (running || !phone()) return; running = true;
+      fit();
+      FACES.forEach(([n], i) => { const im = new Image(); im.onload = () => { imgs[i] = im; if (i === 0) host.classList.add("is-live"); }; im.src = `assets/intro/${n}.webp`; });
+      shown = now();
+      requestAnimationFrame(draw);
+    },
+  };
+}
+const poster = initPoster($("#heroPoster"));
 
 /* ───────── TV wall: every screen keeps changing ───────── */
 (() => {
