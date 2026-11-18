@@ -23,14 +23,13 @@ document.body.insertAdjacentHTML("afterbegin", `
   <header class="nav" id="nav">
     <nav class="nav__links" aria-label="Main">
       <a href="./"${page === "home" ? ' aria-current="page"' : ""}>Home</a>
-      <a href="drop.html"${page === "drop" ? ' aria-current="page"' : ""}>Drop 01</a>
+      <a href="drop.html"${page === "drop" ? ' aria-current="page"' : ""}>Bags</a>
       <a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a>
     </nav>
     <a class="nav__logo" href="./" aria-label="RUMOAR home">RUMOAR</a>
     <div class="nav__actions">
-      <a class="nav__drop" href="drop.html"${page === "drop" ? ' aria-current="page"' : ""}>Drop 01</a>
       <button class="nav__sound" id="navSound" type="button" aria-pressed="false" aria-label="Sound on" title="Sound"><i></i><i></i><i></i><i></i></button>
-      <button class="nav__member" id="navMember" type="button">Join</button>
+      <button class="nav__member" id="navMember" type="button">Join waitlist</button>
       <button class="nav__wish" id="navWish" type="button" aria-label="Open wishlist">${HEART}<span class="nav__count" id="wishCount">0</span></button>
     </div>
   </header>`);
@@ -45,9 +44,9 @@ document.body.insertAdjacentHTML("beforeend", `
         <span class="signup__tag">Who are you today?</span>
       </div>
       <form class="signup__form" id="signupForm" novalidate>
-        <span class="label">Join the list</span>
-        <h2 id="signupTitle" class="head">Before you enter.</h2>
-        <p class="muted">Members see Drop 01 first, keep a wishlist, and hear from us the moment it goes live.</p>
+        <span class="label">Launching soon</span>
+        <h2 id="signupTitle" class="head">Join the waitlist.</h2>
+        <p class="muted">Be the first to know when RUMOAR launches. Heart the bags you want and we’ll tell you the moment they go live.</p>
         <label class="field"><span>Full name</span><input name="name" autocomplete="name" required maxlength="80" placeholder="Your name" /><small class="field__err"></small></label>
         <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" inputmode="email" required maxlength="120" placeholder="you@email.com" /><small class="field__err"></small></label>
         <div class="field-row">
@@ -55,7 +54,7 @@ document.body.insertAdjacentHTML("beforeend", `
           <label class="field"><span>Age</span><input name="age" type="number" inputmode="numeric" min="13" max="100" required placeholder="25" /><small class="field__err"></small></label>
         </div>
         <label class="field"><span>Favourite superhero or animated character</span><input name="favCharacter" required maxlength="80" placeholder="The one you’d be for a day" /><small class="field__err"></small></label>
-        <button class="btn btn--ink btn--block" type="submit" id="signupSubmit">Enter RUMOAR <span aria-hidden="true">→</span></button>
+        <button class="btn btn--ink btn--block" type="submit" id="signupSubmit">Join the waitlist <span aria-hidden="true">→</span></button>
         <p class="fine">We’ll only write to you about RUMOAR launches. No spam, ever.</p>
         <p class="signup__error" id="signupError" role="alert"></p>
       </form>
@@ -80,7 +79,7 @@ document.body.insertAdjacentHTML("beforeend", `
         <p class="pd__desc" id="pDesc"></p>
         <ul class="pd__details" id="pDetails"></ul>
         <button class="btn btn--flame btn--block" id="pWish" type="button"></button>
-        <p class="fine">Not on sale yet. Wishlisted members hear first when Drop 01 opens.</p>
+        <p class="fine">Not on sale yet. Join the waitlist and you’ll hear first when it launches.</p>
       </div>
     </div>
   </div>
@@ -148,7 +147,8 @@ let navTimer = null;
 function renderNavName() {
   const m = store.member, btn = $("#navMember");
   clearInterval(navTimer);
-  if (!m) { btn.textContent = "Join"; btn.removeAttribute("aria-label"); return; }
+  if (!m) { btn.textContent = "Join waitlist"; btn.removeAttribute("aria-label"); btn.classList.remove("is-member"); return; }
+  btn.classList.add("is-member");
   const first = m.name.split(" ")[0].slice(0, 12);
   const hero = (m.favCharacter || "").slice(0, 12);
   const words = [first, hero || first];
@@ -261,7 +261,7 @@ form.addEventListener("submit", async (e) => {
     await store.signUp(data);
     closeLayer($("#signup"));
     renderNavName();
-    toast(`Welcome in, <b>${esc(data.name.split(" ")[0])}</b>. Today you’re ${esc(data.favCharacter)}.`);
+    toast(`You’re on the list, <b>${esc(data.name.split(" ")[0])}</b>. We’ll tell you first.`);
     memberListeners.forEach((fn) => fn(store.member));
     if (state.pendingProduct) {
       const id = state.pendingProduct; state.pendingProduct = null;
@@ -342,9 +342,9 @@ function renderDrawer() {
         <button class="drawer__open" type="button" data-view="${p.id}"><strong>${esc(p.name)}</strong><span>${esc(p.colour)} · ${formatINR(p.price)}</span></button>
         <button class="drawer__rm" type="button" data-rm="${p.id}" aria-label="Remove ${esc(p.name)}">Remove</button>
       </li>`).join("")
-    : `<li class="drawer__empty"><span>Nothing here yet.<br/>Pick the one you are today.</span><a class="btn btn--ink" href="drop.html">See Drop 01</a></li>`;
+    : `<li class="drawer__empty"><span>Nothing here yet.<br/>Pick the one you are today.</span><a class="btn btn--ink" href="./#bags">See the bags</a></li>`;
   const m = store.member;
-  $("#drawerFoot").innerHTML = items.length && m ? `<span>We’ll write to <b>${esc(m.email)}</b> the moment Drop 01 opens.</span>` : "";
+  $("#drawerFoot").innerHTML = items.length && m ? `<span>We’ll write to <b>${esc(m.email)}</b> the moment we launch.</span>` : "";
 }
 $("#drawerList").addEventListener("click", (e) => {
   const rm = e.target.closest("[data-rm]"), view = e.target.closest("[data-view]");
@@ -446,7 +446,7 @@ export { PRODUCTS, CATEGORIES, byId, formatINR };
 /* ───────── cursor that tells you what each thing does (mouse only) ───────── */
 (() => {
   if (!matchMedia("(hover: hover) and (pointer: fine)").matches || reduceMotion) return;
-  const LABELS = [[".hero__word.is-hot", "Play"], ["#sticker", "Drag"], [".set", "Zap"], [".look__card", "View"], [".card", "View"]];
+  const LABELS = [[".hero__word.is-hot", "Play"], [".look__card", "View"], [".card", "View"]];
   const cur = document.createElement("div"); cur.className = "cursor"; cur.setAttribute("aria-hidden", "true"); cur.innerHTML = "<span></span>";
   document.body.appendChild(cur);
   const label = cur.firstChild;
@@ -467,4 +467,39 @@ export { PRODUCTS, CATEGORIES, byId, formatINR };
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
+})();
+
+/* ───────── live favicon: the pixel bag shimmers and its blocks pop, like the intro ───────── */
+(() => {
+  const link = document.querySelector('link[rel="icon"]');
+  if (!link || reduceMotion) return;
+  link.type = "image/png";
+  const G = ["..HHH..", ".H...H.", "BBBBBBB", "BBBBBBB", "BFFFFFB", "BBBKBBB", "BBBBBBB"];
+  const BODY = ["#ff9a4a", "#ff8a3d", "#f4702a", "#e8561c", "#d4431a", "#c2380f", "#a92c0e"];
+  const c = document.createElement("canvas"); c.width = c.height = 64;
+  const g = c.getContext("2d");
+  const cell = 6.4, gap = 1.1, off = (64 - (7 * cell + 6 * gap)) / 2;
+  const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, r) : g.rect(x, y, w, h); g.fill(); };
+  let t0 = performance.now();
+  function frame() {
+    const t = (performance.now() - t0) / 1000;
+    g.clearRect(0, 0, 64, 64);
+    g.fillStyle = "#0b0302"; rr(0, 0, 64, 64, 15);
+    G.forEach((row, y) => [...row].forEach((ch, x) => {
+      if (ch === ".") return;
+      // a diagonal wave runs through the bag every 2.6s
+      const w = Math.max(0, Math.sin((t * 2.4 - (x + y) * 0.45) % (Math.PI * 2.6)));
+      const s = cell * (1 - 0.32 * w * w);
+      const o = (cell - s) / 2;
+      g.fillStyle = ch === "H" || ch === "F" ? "#f6efe6" : ch === "K" ? "#0b0302" : BODY[Math.min(6, ((x + y) >> 1) + (y > 3 ? 1 : 0))];
+      if (w > 0.6 && ch === "B") g.fillStyle = "#ffd2a8";
+      rr(off + x * (cell + gap) + o, off + y * (cell + gap) + o, s, s, 1.2);
+    }));
+    link.href = c.toDataURL("image/png");
+  }
+  setInterval(frame, 120);
+  frame();
+  // a little nudge in the tab bar when you wander off
+  const title = document.title;
+  document.addEventListener("visibilitychange", () => { document.title = document.hidden ? "Come back. The bags miss you." : title; });
 })();

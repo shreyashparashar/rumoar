@@ -4,30 +4,31 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>RUMOAR · Who are you today?</title>
-  <meta name="description" content="RUMOAR is a design-first men's accessories house. Drop 01: fifteen bags, each a character. Join the list, build your wishlist, hear first at launch." />
+  <meta name="description" content="RUMOAR is a design-first men's accessories house. Fifteen bags, each a character. Join the waitlist and hear first at launch." />
   <meta name="theme-color" content="#0b0302" />
   <meta property="og:title" content="RUMOAR · Who are you today?" />
-  <meta property="og:description" content="Drop 01: fifteen bags, each a character. Join the list and hear first at launch." />
+  <meta property="og:description" content="Fifteen bags, each a character. Join the waitlist and hear first at launch." />
   <meta property="og:image" content="assets/og.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,200;1,300&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <script>
     (function () {
       var d = document.documentElement; d.classList.add("js");
-      var seen = false; try { seen = sessionStorage.getItem("rumoar.intro.v2") === "1"; } catch (e) {}
+      var seen = false; try { seen = sessionStorage.getItem("rumoar.intro.v3") === "1"; } catch (e) {}
       if (!seen && !matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("is-intro");
     })();
   </script>
 </head>
 <body data-page="home">
-  <a class="skip" href="#onair">Skip to content</a>
+  <a class="skip" href="#bags">Skip to content</a>
 
   <div class="intro" id="intro" aria-hidden="true">
-    <div class="intro__ui"><span>(Drop 01)</span><span>2026</span><span>Tap to skip</span><span data-clock>IST</span></div>
+    <div class="intro__ui"><span>RUMOAR</span><span>2026</span><span>Tap to skip</span><span data-clock>IST</span></div>
     <canvas class="intro__blocks"></canvas>
     <p class="intro__line">Who are you today?</p>
   </div>
@@ -43,48 +44,32 @@
       <div class="hero__dim" aria-hidden="true"></div>
       <div class="hero__poster" id="heroPoster" aria-hidden="true">
         <canvas></canvas>
-        <span class="hero__script" id="heroScript">Maverick</span>
-        <div class="hero__meta">
-          <span class="hero__inf">∞</span>
-          <p class="hero__l1">Bombay, India, <small>2026</small></p>
-          <p class="hero__l2">( Drop 01 ) <b>Own the look</b></p>
-          <p class="hero__l3"><span id="heroIdx">01</span> / 07 · <span id="heroWho">The Maverick</span></p>
-        </div>
       </div>
       <div class="hero__word" id="heroWord" aria-hidden="true">
         <canvas></canvas>
       </div>
       <h1 class="sr">RUMOAR</h1>
-      <div class="hero__end"><a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a></div>
-    </section>
-
-    <section class="tv" id="onair" data-dark>
-      <div class="bar bar--dark"><span><i class="pulse"></i>On air</span><span data-clock>IST</span></div>
-      <h2 class="head rv">Every channel is you.</h2>
-      <button class="sticker" id="sticker" type="button" aria-label="RUMOAR sticker. Drag it anywhere.">
-        <svg viewBox="0 0 200 200" aria-hidden="true">
-          <defs><path id="ring" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" /></defs>
-          <circle cx="100" cy="100" r="96" class="sticker__base" />
-          <g class="sticker__spin"><text><textPath href="#ring">WHO ARE YOU TODAY ✦ DROP 01 ✦ RUMOAR ✦ OWN THE LOOK ✦ </textPath></text></g>
-          <text x="100" y="96" text-anchor="middle" class="sticker__big">R</text>
-          <text x="100" y="128" text-anchor="middle" class="sticker__small">DROP 01</text>
-        </svg>
-        <span class="sticker__tip">Play with me</span>
-      </button>
-      <div class="tv__wall" id="tvWall">
-        <figure class="set set--a" data-ch="video:assets/video/street-a.mp4"></figure>
-        <figure class="set set--b" data-ch="word"></figure>
-        <figure class="set set--c" data-ch="img:assets/collage/01.webp|assets/collage/04.webp|assets/stills/deck-pixel.webp|assets/collage/02.webp"></figure>
-        <figure class="set set--d" data-ch="static"></figure>
-        <figure class="set set--e" data-ch="products"></figure>
-        <figure class="set set--f" data-ch="video:assets/video/street-b.mp4"></figure>
-        <figure class="set set--g" data-ch="img:assets/collage/17.webp|assets/collage/16.webp|assets/collage/18.webp|assets/collage/03.webp"></figure>
+      <div class="hero__end">
+        <p class="hero__note" id="heroNote">Launching soon. Be the first to know.</p>
+        <div class="hero__ctas">
+          <button class="btn btn--flame btn--big" type="button" data-join>Join the waitlist <span aria-hidden="true">→</span></button>
+          <a class="btn btn--ghost hero__see" href="#bags">See the bags <span aria-hidden="true">↓</span></a>
+        </div>
       </div>
     </section>
 
+    <section class="bags" id="bags" aria-labelledby="bagsTitle">
+      <div class="bags__head">
+        <h2 class="head" id="bagsTitle">The bags.</h2>
+        <p class="muted">Fifteen pieces, each a character. Heart the ones you want and we’ll tell you first.</p>
+        <span class="bags__hint" aria-hidden="true">Swipe →</span>
+      </div>
+      <ul class="cards bags__rail" id="bagsRail"></ul>
+    </section>
+
     <div class="tapes" aria-hidden="true">
-      <div class="tape tape--a"><div class="tape__track" data-tape="WHO ARE YOU TODAY|DROP 01|OWN THE LOOK|BAG IT|RUMOAR|STYLED NOT STOCKED"></div></div>
-      <div class="tape tape--b"><div class="tape__track" data-tape="15 OBJECTS|6 PERSONALITIES|1 YOU|MEMBERS FIRST|WISHLIST NOW|HEAR FIRST"></div></div>
+      <div class="tape tape--a"><div class="tape__track" data-tape="WHO ARE YOU TODAY|OWN THE LOOK|BAG IT|RUMOAR|STYLED NOT STOCKED"></div></div>
+      <div class="tape tape--b"><div class="tape__track" data-tape="15 BAGS|6 PERSONALITIES|1 YOU|JOIN THE WAITLIST|HEAR FIRST"></div></div>
     </div>
 
     <section class="look" id="look" data-dark>
@@ -98,29 +83,27 @@
         <div class="look__foot">
           <span class="label" id="lookCount">01 / 16</span>
           <div class="look__bar"><i id="lookBar"></i></div>
-          <a class="btn btn--cream" href="drop.html">Find yours <span aria-hidden="true">→</span></a>
+          <button class="btn btn--cream" type="button" data-join>Join the waitlist <span aria-hidden="true">→</span></button>
         </div>
       </div>
     </section>
 
-    <section class="closer" data-dark>
+    <section class="closer" id="closer" data-dark>
       <img class="closer__bg" src="assets/collage/26.webp" alt="" loading="lazy" />
-      <span class="label" style="color: var(--cream-2)">Drop 01 · Launching soon</span>
-      <h2 class="head rv">Your look is waiting.</h2>
+      <span class="label" style="color: var(--orange-2)">Launching soon</span>
+      <h2 class="head rv" id="closerTitle">Be the first to know.</h2>
+      <p class="closer__sub" id="closerSub">Join the waitlist and we’ll tell you the moment the bags go live.</p>
       <div class="closer__cta">
-        <a class="btn btn--cream" href="drop.html">Enter Drop 01 <span aria-hidden="true">→</span></a>
+        <button class="btn btn--flame btn--big" type="button" data-join>Join the waitlist <span aria-hidden="true">→</span></button>
         <a class="btn btn--ghost" href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">@rumoarr</a>
       </div>
     </section>
   </main>
 
   <footer class="foot" data-dark>
-    <div class="foot__row">
-      <span>Designing a world, not just a product</span>
-      <nav aria-label="Footer"><a href="drop.html">Drop 01</a><a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a></nav>
-    </div>
+    <div class="foot__row"><nav aria-label="Footer"><a href="./#bags">Bags</a><a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a></nav></div>
     <div class="foot__mark" aria-hidden="true">RUMOAR</div>
-    <div class="foot__row"><span>© 2026 RUMOAR</span><span>Designed in India</span></div>
+    <div class="foot__row"><span>© 2026 RUMOAR</span></div>
   </footer>
 
   <script type="module" src="js/home.js"></script>
