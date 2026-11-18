@@ -8,7 +8,11 @@ import { initWordmark } from "./wordmark.js";
 const heroEl = $("#hero");
 const badge = new Flap($("#heroBadge"), 1);
 const LETTERS = "RUMOAR";
-const wordmark = initWordmark($("#heroWord"));
+const sideName = new Flap($("#heroSideN"), 10);
+sideName.set("MAVERICK");
+const wordmark = initWordmark($("#heroWord"), {
+  onLetter: (i, name) => { sideName.set(name.replace(/^The /, "")); $("#heroSideI").textContent = `0${i + 1} / 06`; },
+});
 const hero = initHero(heroEl, {
   onBeat: (i) => { if (i >= 0) badge.set(LETTERS[i % LETTERS.length]); },
   onOpeningDone: () => { heroEl.classList.add("is-open"); wordmark.start(); },
