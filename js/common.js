@@ -446,7 +446,7 @@ export { PRODUCTS, CATEGORIES, byId, formatINR };
 /* ───────── cursor that tells you what each thing does (mouse only) ───────── */
 (() => {
   if (!matchMedia("(hover: hover) and (pointer: fine)").matches || reduceMotion) return;
-  const LABELS = [[".hero__word.is-hot", "Play"], ["#sticker", "Drag"], [".set", "Zap"], [".pop__tile", "Flip"], [".look__card", "View"], [".card", "View"]];
+  const LABELS = [[".hero__word.is-hot", "Play"], ["#sticker", "Drag"], [".set", "Zap"], [".look__card", "View"], [".card", "View"]];
   const cur = document.createElement("div"); cur.className = "cursor"; cur.setAttribute("aria-hidden", "true"); cur.innerHTML = "<span></span>";
   document.body.appendChild(cur);
   const label = cur.firstChild;

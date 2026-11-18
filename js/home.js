@@ -164,34 +164,6 @@ $$("[data-tape]").forEach((t) => {
   t.innerHTML = words + words + words + words;
 });
 
-/* ───────── live: pop-art wall. Same face, eight moods, palettes keep rolling ───────── */
-(() => {
-  const grid = $("#popGrid");
-  if (!grid) return;
-  const PALETTES = [
-    ["#e5341f", "#ffd9b8"], ["#0b0302", "#ff8a3d"], ["#ff5fa2", "#fff0b3"], ["#1d3bff", "#ffc9a8"],
-    ["#3a0a6b", "#ff8a3d"], ["#b0170c", "#ffd27a"], ["#0f7a5c", "#ffe7d6"], ["#7a1cff", "#ffb1c8"],
-    ["#0b0302", "#f6efe6"], ["#0f2a6b", "#ffe0a0"],
-  ];
-  const MOODS = ["Monday", "Late night", "Date night", "Weekend", "Off duty", "Big meeting", "Gallery", "Afterparty"];
-  grid.innerHTML = MOODS.map((m, i) => `
-    <figure class="pop__tile" style="--a:${PALETTES[i][0]};--b:${PALETTES[i][1]}">
-      <div class="pop__art"><img src="assets/pop/face.webp" alt="" loading="lazy" /><img class="pop__real" src="assets/pop/face-color.webp" alt="" loading="lazy" /></div>
-      <figcaption><span>${String(i + 1).padStart(2, "0")}</span>${m}</figcaption>
-    </figure>`).join("");
-  const tiles = $$(".pop__tile", grid);
-  tiles.forEach((t) => t.addEventListener("click", () => t.classList.toggle("is-real")));
-  if (reduceMotion) return;
-  let shift = 0;
-  setInterval(() => {
-    shift++;
-    tiles.forEach((t, i) => setTimeout(() => {
-      const p = PALETTES[(i + shift) % PALETTES.length];
-      t.style.setProperty("--a", p[0]); t.style.setProperty("--b", p[1]);
-    }, i * 90));
-  }, 1600);
-})();
-
 /* signing up from the homepage takes you straight into the drop */
 onMember(() => setTimeout(() => { location.href = "drop.html"; }, 1400));
 
