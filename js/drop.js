@@ -3,7 +3,7 @@ import { $, $$, esc, state, openProduct, toggleWish, onWishChange, PRODUCTS, CAT
 import { cardsHTML } from "./cards.js";
 
 let filter = "all";
-const FEATURED = new Set([0]); // big tiles
+const FEATURED = new Set(); // every photo at its own shape, no big crop tiles
 
 function renderFilters() {
   $("#filters").innerHTML = CATEGORIES.map((c) => {

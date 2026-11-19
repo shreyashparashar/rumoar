@@ -23,12 +23,10 @@ document.body.insertAdjacentHTML("afterbegin", `
   <header class="nav" id="nav">
     <nav class="nav__links" aria-label="Main">
       <a href="./"${page === "home" ? ' aria-current="page"' : ""}>Home</a>
-      <a href="./#bags" data-bags>Bags</a>
       <a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a>
     </nav>
     <a class="nav__logo" href="./" aria-label="RUMOAR home">RUMOAR</a>
     <div class="nav__actions">
-      <a class="nav__bags" href="./#bags" data-bags>Bags</a>
       <button class="nav__sound" id="navSound" type="button" aria-pressed="false" aria-label="Sound on" title="Sound"><i></i><i></i><i></i><i></i></button>
       <button class="nav__member" id="navMember" type="button">Join<span class="nav__wl"> waitlist</span></button>
       <button class="nav__wish" id="navWish" type="button" aria-label="Open wishlist">${HEART}<span class="nav__count" id="wishCount">0</span></button>
@@ -303,7 +301,7 @@ export function openProduct(id) {
   $("#pDesc").textContent = p.description;
   $("#pDetails").innerHTML = p.details.map((d) => `<li>${esc(d)}</li>`).join("");
   const views = ["front", "side"];
-  $("#pdTrack").innerHTML = p.images.map((src, i) => `<img src="${src}" alt="${esc(p.name)}, ${views[i]} view" width="1200" height="1600" />`).join("");
+  $("#pdTrack").innerHTML = p.images.map((src, i) => `<img src="${src}" alt="${esc(p.name)}, ${views[i]} view" width="1400" height="1875" />`).join("");
   $("#pdDots").innerHTML = p.images.map((_, i) => `<button type="button" aria-label="Show ${views[i]} view" data-dot="${i}" aria-current="${i === 0}"></button>`).join("");
   $("#pdTrack").scrollLeft = 0;
   renderWishButton(id);
@@ -338,7 +336,7 @@ function renderDrawer() {
   $("#drawerList").innerHTML = items.length
     ? items.map((p) => `
       <li class="drawer__item">
-        <img src="${p.images[0]}" alt="" width="76" height="101" loading="lazy" />
+        <img src="${p.images[0]}" alt="" width="76" height="102" loading="lazy" />
         <button class="drawer__open" type="button" data-view="${p.id}"><strong>${esc(p.name)}</strong><span>${esc(p.colour)} · ${formatINR(p.price)}</span></button>
         <button class="drawer__rm" type="button" data-rm="${p.id}" aria-label="Remove ${esc(p.name)}">Remove</button>
       </li>`).join("")
