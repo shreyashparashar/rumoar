@@ -302,7 +302,7 @@ export function openProduct(id) {
   $("#pDesc").textContent = p.description;
   $("#pDetails").innerHTML = p.details.map((d) => `<li>${esc(d)}</li>`).join("");
   const views = ["front", "side"];
-  $("#pdTrack").innerHTML = p.images.map((src, i) => `<img src="${src}" alt="${esc(p.name)}, ${views[i]} view" width="1000" height="1139" />`).join("");
+  $("#pdTrack").innerHTML = p.images.map((src, i) => `<img src="${src}" alt="${esc(p.name)}, ${views[i]} view" width="1200" height="1600" />`).join("");
   $("#pdDots").innerHTML = p.images.map((_, i) => `<button type="button" aria-label="Show ${views[i]} view" data-dot="${i}" aria-current="${i === 0}"></button>`).join("");
   $("#pdTrack").scrollLeft = 0;
   renderWishButton(id);
@@ -337,7 +337,7 @@ function renderDrawer() {
   $("#drawerList").innerHTML = items.length
     ? items.map((p) => `
       <li class="drawer__item">
-        <img src="${p.images[0]}" alt="" width="76" height="87" loading="lazy" />
+        <img src="${p.images[0]}" alt="" width="76" height="101" loading="lazy" />
         <button class="drawer__open" type="button" data-view="${p.id}"><strong>${esc(p.name)}</strong><span>${esc(p.colour)} · ${formatINR(p.price)}</span></button>
         <button class="drawer__rm" type="button" data-rm="${p.id}" aria-label="Remove ${esc(p.name)}">Remove</button>
       </li>`).join("")

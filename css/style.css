@@ -259,7 +259,7 @@ html.is-intro .intro { display: block; }
 @media (min-width: 900px) { .card--hero { grid-row: span 2; } .card--hero .card__media { aspect-ratio: auto; height: calc(100% - 66px); } }
 .card__open { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; width: 100%; height: 100%; }
 .card__open:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; }
-.card__media { position: relative; aspect-ratio: 1000 / 1139; overflow: hidden; background: var(--stone); }
+.card__media { position: relative; aspect-ratio: 3 / 4; overflow: hidden; background: var(--stone); }
 .card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.6s var(--ease), transform 1.2s var(--ease); }
 .card__media img + img { opacity: 0; }
 @media (hover: hover) { .card:hover .card__media img:first-child { opacity: 0; } .card:hover .card__media img + img { opacity: 1; transform: scale(1.03); } }
@@ -331,7 +331,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-app
 .pd__gallery { position: relative; background: var(--stone); }
 .pd__track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .pd__track::-webkit-scrollbar { display: none; }
-.pd__track img { flex: 0 0 100%; width: 100%; aspect-ratio: 1000 / 1139; object-fit: cover; scroll-snap-align: start; }
+.pd__track img { flex: 0 0 100%; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; scroll-snap-align: start; }
 .pd__dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 8px; }
 .pd__dots button { width: 28px; height: 3px; border: 0; padding: 0; background: rgba(0, 0, 0, 0.2); }
 .pd__dots button[aria-current="true"] { background: var(--ink); }
@@ -350,7 +350,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-app
 .drawer__head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
 .drawer__list { list-style: none; margin: 0; padding: 6px 20px; overflow: auto; }
 .drawer__item { display: grid; grid-template-columns: 70px 1fr auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
-.drawer__item img { width: 70px; aspect-ratio: 1000 / 1139; object-fit: cover; background: var(--stone); }
+.drawer__item img { width: 70px; aspect-ratio: 3 / 4; object-fit: cover; background: var(--stone); }
 .drawer__open { all: unset; cursor: pointer; display: grid; }
 .drawer__item strong { font-weight: 700; }
 .drawer__item span { color: var(--mute); }

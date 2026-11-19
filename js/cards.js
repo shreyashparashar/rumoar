@@ -7,8 +7,8 @@ export function cardsHTML(list = PRODUCTS, { featured = new Set() } = {}) {
       <button class="card__heart" type="button" aria-pressed="${state.wish.has(p.id)}" aria-label="Wishlist ${esc(p.name)}">${HEART}</button>
       <button class="card__open" type="button" aria-label="View ${esc(p.name)}">
         <span class="card__media">
-          <img src="${p.images[0]}" alt="${esc(p.name)}" loading="${i < 4 ? "eager" : "lazy"}" width="1000" height="1139" />
-          <img src="${p.images[1]}" alt="" loading="lazy" width="1000" height="1139" />
+          <img src="${p.images[0]}" alt="${esc(p.name)}" loading="${i < 4 ? "eager" : "lazy"}" width="1200" height="1600" />
+          <img src="${p.images[1]}" alt="" loading="lazy" width="1200" height="1600" />
           <span class="card__no">${String(i + 1).padStart(2, "0")}</span>
         </span>
         <span class="card__body"><span class="card__name">${esc(p.name)}</span><span class="card__price">${formatINR(p.price)}</span></span>
