@@ -15,7 +15,8 @@ export const CATEGORIES = [
 
 const p = (o) => ({
   ...o,
-  images: [`assets/products/${o.id}-front.webp`, `assets/products/${o.id}-side.webp`],
+  // on-model shot leads; the flat-lays follow
+  images: [`assets/products/${o.id}-model.webp`, `assets/products/${o.id}-front.webp`, `assets/products/${o.id}-side.webp`],
 });
 
 export const PRODUCTS = [
