@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────
-//  RUMOAR · Drop 01 catalogue
+//  RUMOAR catalogue
 //  Edit this file to change names, copy, prices or order.
 //  Images live in /assets/products/<id>-front.webp and -side.webp
 //  NOTE: finishes are described from the renders. Confirm the
@@ -19,6 +19,40 @@ const p = (o) => ({
 });
 
 export const PRODUCTS = [
+  p({
+    id: "sentinel",
+    name: "The Sentinel",
+    category: "backpack",
+    type: "Sculpted shell backpack",
+    colour: "Onyx / Stone",
+    price: 4849,
+    tagline: "For the days that hit back.",
+    description:
+      "An onyx exoskeleton moulded over soft, stone-textured panels, built to take the knocks of the city and still look composed. Twin full-height zips finish in high-vis orange pulls you can find without looking, and cinch straps at the base keep the load locked in. Armour, kept quiet.",
+    details: [
+      "Moulded exoskeleton over textured panels",
+      "Twin full-height zips with orange pulls",
+      "Compression straps and padded harness",
+      "Top grab handle with raised RUMOAR plate",
+    ],
+  }),
+  p({
+    id: "futurist",
+    name: "The Futurist",
+    category: "backpack",
+    type: "Sculpted shell backpack",
+    colour: "Stone / Graphite",
+    price: 4749,
+    tagline: "For the man already living in next year.",
+    description:
+      "A sculpted shell in soft stone, with textured panels and a graphite spine that sweeps up into the top handle. It looks drawn for another decade and carries like it was made for this one. Orange zip pulls bring the one hit of colour, and a vented base keeps it light on the back.",
+    details: [
+      "Moulded shell with textured side panels",
+      "Sculpted spine that forms the top handle",
+      "Full-height zip with orange pulls",
+      "Vented base and padded mesh straps",
+    ],
+  }),
   p({
     id: "maverick",
     name: "The Maverick",
