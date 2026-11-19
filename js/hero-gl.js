@@ -24,7 +24,7 @@ const OPENING = [
   { ...I("26"), ms: 520, fx: { zoom: [0.9, 0] } },
 ];
 // the reel after the opening
-const REEL = [V("street-a"), I("16"), V("street-b"), I("12"), I("22"), I("17"), I("03"), I("11"), I("00")];
+const REEL = [V("street-a"), I("16"), V("street-b"), I("22"), I("17"), I("03"), I("18"), I("00")];
 
 const VERT = `attribute vec2 p; varying vec2 v; void main(){ v = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
 const FRAG = `

@@ -23,13 +23,14 @@ document.body.insertAdjacentHTML("afterbegin", `
   <header class="nav" id="nav">
     <nav class="nav__links" aria-label="Main">
       <a href="./"${page === "home" ? ' aria-current="page"' : ""}>Home</a>
-      <a href="drop.html"${page === "drop" ? ' aria-current="page"' : ""}>Bags</a>
+      <a href="./#bags" data-bags>Bags</a>
       <a href="https://www.instagram.com/rumoarr/" target="_blank" rel="noopener">Instagram</a>
     </nav>
     <a class="nav__logo" href="./" aria-label="RUMOAR home">RUMOAR</a>
     <div class="nav__actions">
+      <a class="nav__bags" href="./#bags" data-bags>Bags</a>
       <button class="nav__sound" id="navSound" type="button" aria-pressed="false" aria-label="Sound on" title="Sound"><i></i><i></i><i></i><i></i></button>
-      <button class="nav__member" id="navMember" type="button">Join waitlist</button>
+      <button class="nav__member" id="navMember" type="button">Join<span class="nav__wl"> waitlist</span></button>
       <button class="nav__wish" id="navWish" type="button" aria-label="Open wishlist">${HEART}<span class="nav__count" id="wishCount">0</span></button>
     </div>
   </header>`);
@@ -147,7 +148,7 @@ let navTimer = null;
 function renderNavName() {
   const m = store.member, btn = $("#navMember");
   clearInterval(navTimer);
-  if (!m) { btn.textContent = "Join waitlist"; btn.removeAttribute("aria-label"); btn.classList.remove("is-member"); return; }
+  if (!m) { btn.innerHTML = 'Join<span class="nav__wl"> waitlist</span>'; btn.removeAttribute("aria-label"); btn.classList.remove("is-member"); return; }
   btn.classList.add("is-member");
   const first = m.name.split(" ")[0].slice(0, 12);
   const hero = (m.favCharacter || "").slice(0, 12);
@@ -422,11 +423,22 @@ export function armReveals() {
   document.addEventListener("rumoar:sound-on", () => {
     wantOn = true;
     try { localStorage.setItem(KEY, "on"); } catch {}
-    ui(true); start();
+    ui(true);
+    start().then((ok) => { if (!ok) EVENTS.forEach((t) => addEventListener(t, kick, { capture: true, passive: true })); });
   });
   addEventListener("pagehide", () => { try { sessionStorage.setItem("rumoar.sound.t", String(audio.currentTime)); } catch {} });
   document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn) audio.play().catch(() => {}); });
 })();
+
+/* ───────── Bags: glide to the section on the homepage, or jump there from anywhere else ───────── */
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("[data-bags], a[href='./#bags']");
+  const sec = document.getElementById("bags");
+  if (!a || !sec) return;
+  e.preventDefault();
+  sec.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  history.replaceState(null, "", "#bags");
+});
 
 /* ───────── boot ───────── */
 renderNavName();

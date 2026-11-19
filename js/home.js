@@ -1,4 +1,4 @@
-// Homepage: pixel intro, hero reel, TV wall, collage strips.
+// Homepage: entry button, intro, hero, bags, look gallery, waitlist.
 import { $, $$, Flap, PRODUCTS, armReveals, onMember, store, state, openSignup, openDrawer, openProduct, toggleWish, onWishChange } from "./common.js";
 import { cardsHTML } from "./cards.js";
 import { runIntro } from "./intro.js";
@@ -76,14 +76,13 @@ const poster = initPoster($("#heroPoster"));
 /* ───────── own the look: a horizontal gallery driven by scroll ───────── */
 (() => {
   const sec = $("#look"), track = $("#lookTrack"), bg = $("#lookBg"), count = $("#lookCount"), bar = $("#lookBar");
-  const looks = [["16", "Golden hour"], ["17", "After dark"], ["05", "Commute"], ["12", "Statement"], ["18", "Future proof"], ["06", "Colour hit"],
-    ["10", "Chrome"], ["22", "Street"], ["00", "Mirror, mirror"], ["11", "Red room"], ["30", "Denim on denim"], ["13", "Office hours"],
-    ["26", "Rush hour"], ["20", "Neighbourhood"], ["19", "Off duty"], ["29", "Check mate"]];
-  track.innerHTML = looks.map(([id, name], i) => `
-    <figure class="look__card${i % 2 ? " look__card--low" : ""}">
-      <div class="look__img"><img src="assets/collage/${id}.webp" alt="" loading="${i < 4 ? "eager" : "lazy"}" /></div>
-      <figcaption><span>${String(i + 1).padStart(2, "0")}</span>${name}</figcaption>
+  // every bag, side on, straight from the flat-lays
+  track.innerHTML = PRODUCTS.map((p, i) => `
+    <figure class="look__card${i % 2 ? " look__card--low" : ""}" data-id="${p.id}">
+      <div class="look__img"><img src="${p.images[1]}" alt="${p.name}, side view" loading="${i < 4 ? "eager" : "lazy"}" width="1200" height="1600" /></div>
+      <figcaption><span>${String(i + 1).padStart(2, "0")}</span>${p.name}</figcaption>
     </figure>`).join("");
+  track.addEventListener("click", (e) => { const c = e.target.closest(".look__card"); if (c) openProduct(c.dataset.id); });
   const cards = $$(".look__card", track);
   let travel = 0, ticking = false;
   function size() {
@@ -170,5 +169,14 @@ armReveals();
     setTimeout(() => gate.remove(), 1500);
   };
   btn.addEventListener("click", go);
+  // arriving from the Bags link on another page: skip the button and land on the bags
+  if (location.hash === "#bags") {
+    try { sessionStorage.setItem("rumoar.intro.v3", "1"); } catch {}
+    gone = true; gate.remove();
+    document.documentElement.classList.remove("is-gate", "is-intro");
+    document.dispatchEvent(new CustomEvent("rumoar:sound-on"));
+    runIntro(() => hero.start(), () => hero.start());
+    requestAnimationFrame(() => $("#bags").scrollIntoView({ block: "start" }));
+  }
   addEventListener("keydown", (e) => { if (!gone && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); go(); } });
 })();

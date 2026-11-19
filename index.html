@@ -20,6 +20,7 @@
     (function () {
       var d = document.documentElement; d.classList.add("js");
       var seen = false; try { seen = sessionStorage.getItem("rumoar.intro.v3") === "1"; } catch (e) {}
+      if (location.hash === "#bags") { d.classList.add("no-gate"); return; } // straight to the bags
       if (!seen && !matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("is-intro");
       d.classList.add("is-gate");
     })();
@@ -83,12 +84,12 @@
       <div class="look__pin">
         <div class="look__bg" id="lookBg" aria-hidden="true">Own the look · Own the look ·</div>
         <div class="look__head">
-          <span class="label">The mood</span>
+          <span class="label">Every angle</span>
           <h2 class="head">Own the look.</h2>
         </div>
         <div class="look__track" id="lookTrack"></div>
         <div class="look__foot">
-          <span class="label" id="lookCount">01 / 16</span>
+          <span class="label" id="lookCount">01 / 17</span>
           <div class="look__bar"><i id="lookBar"></i></div>
           <button class="btn btn--cream" type="button" data-join>Join the waitlist <span aria-hidden="true">→</span></button>
         </div>
