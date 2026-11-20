@@ -377,7 +377,7 @@ export function armReveals() {
   setTimeout(() => els.forEach((el) => el.classList.add("in")), 4000);
 }
 
-/* ───────── soundtrack: on by default, the nav toggle only turns it off ───────── */
+/* ───────── soundtrack: on by default, plays 35s per visit then fades out; the nav toggle turns it off or back on ───────── */
 (() => {
   const btn = $("#navSound");
   const KEY = "rumoar.sound.v2";
@@ -385,6 +385,11 @@ export function armReveals() {
   let wantOn = true;
   try { wantOn = localStorage.getItem(KEY) !== "off"; } catch {}
   try { const t = Number(sessionStorage.getItem("rumoar.sound.t")); if (t) audio.currentTime = t; } catch {}
+  // seconds heard this visit, carried across pages; at 35s the track fades away
+  const PLAY_FOR = 35, FADE_MS = 4000;
+  let heard = 0, lastT = null, fadingOut = false;
+  try { heard = Number(sessionStorage.getItem("rumoar.sound.heard")) || 0; } catch {}
+  const spent = () => heard >= PLAY_FOR;
   let fade;
   const ramp = (to, ms, done) => {
     clearInterval(fade);
@@ -396,13 +401,14 @@ export function armReveals() {
     }, 30);
   };
   const ui = (on) => { btn.setAttribute("aria-pressed", on); btn.setAttribute("aria-label", on ? "Turn sound off" : "Turn sound on"); btn.classList.toggle("is-on", on); };
-  const start = () => { if (!audio.paused) return Promise.resolve(true); return audio.play().then(() => { ramp(0.2, 2200); return true; }).catch(() => false); };
+  const start = () => { if (!audio.paused) return Promise.resolve(true); if (spent()) return Promise.resolve(true); lastT = null; return audio.play().then(() => { ramp(0.2, 2200); return true; }).catch(() => false); };
   const stop = () => ramp(0, 400, () => audio.pause());
   ui(wantOn);
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
-    wantOn = !wantOn;
+    wantOn = !btn.classList.contains("is-on");
     try { localStorage.setItem(KEY, wantOn ? "on" : "off"); } catch {}
+    if (wantOn && spent()) { heard = 0; fadingOut = false; } // turning it back on gives another 35s
     ui(wantOn);
     wantOn ? start() : stop();
   });
@@ -419,13 +425,23 @@ export function armReveals() {
   if (wantOn && !gated) start().then((ok) => { if (!ok) EVENTS.forEach((t) => addEventListener(t, kick, { capture: true, passive: true })); });
   // the entry button on the homepage always means "with sound"
   document.addEventListener("rumoar:sound-on", () => {
-    wantOn = true;
+    wantOn = true; heard = 0; fadingOut = false; // the entry button always starts a fresh 35s
     try { localStorage.setItem(KEY, "on"); } catch {}
     ui(true);
     start().then((ok) => { if (!ok) EVENTS.forEach((t) => addEventListener(t, kick, { capture: true, passive: true })); });
   });
-  addEventListener("pagehide", () => { try { sessionStorage.setItem("rumoar.sound.t", String(audio.currentTime)); } catch {} });
-  document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn) audio.play().catch(() => {}); });
+  audio.addEventListener("timeupdate", () => {
+    const t = audio.currentTime;
+    if (lastT !== null && !audio.paused) { const d = t - lastT; if (d > 0 && d < 1.5) heard += d; }
+    lastT = t;
+    if (spent() && !fadingOut && !audio.paused) {
+      fadingOut = true;
+      ramp(0, FADE_MS, () => { audio.pause(); ui(false); });
+    }
+  });
+  if (spent()) ui(false);
+  addEventListener("pagehide", () => { try { sessionStorage.setItem("rumoar.sound.t", String(audio.currentTime)); sessionStorage.setItem("rumoar.sound.heard", String(heard)); } catch {} });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) audio.pause(); else if (wantOn && !spent()) { lastT = null; audio.play().catch(() => {}); } });
 })();
 
 /* ───────── Bags: glide to the section on the homepage, or jump there from anywhere else ───────── */
